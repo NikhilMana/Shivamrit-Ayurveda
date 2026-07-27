@@ -5,15 +5,23 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "jmgluhfmvjphxbptnkeo.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
         hostname: "images.unsplash.com",
       },
       {
         protocol: "https",
         hostname: "images.higgs.ai",
-      },
-      {
-        protocol: "https",
-        hostname: "shrug-person-78902957.figma.site",
       },
     ],
   },
