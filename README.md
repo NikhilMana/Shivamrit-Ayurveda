@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shivamrit Ayurveda - Production E-Commerce Platform
 
-## Getting Started
+A production-ready, highly scalable, and beautifully animated e-commerce application built for Shivamrit Ayurveda.
 
-First, run the development server:
+---
 
+## 🌿 Tech Stack & Architecture
+
+- **Framework**: Next.js 15 (App Router with Server Components & Route Handlers)
+- **Database**: Supabase PostgreSQL + Row Level Security (RLS)
+- **Authentication**: Supabase Auth (Email & Google OAuth 2.0)
+- **State & Data Fetching**: Zustand (Persisted Cart) & TanStack Query
+- **Payments**: Razorpay Online Payments & Cash on Delivery (COD)
+- **Emails**: Resend Email API
+- **Storage**: Supabase Storage Buckets & Cloudinary
+- **Styling & Motion**: Tailwind CSS & Framer Motion & GSAP
+
+---
+
+## 🚀 Getting Started
+
+### 1. Environment Setup
+
+Copy `.env.example` to `.env.local`:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Fill in your Supabase, Razorpay, Resend, and Cloudinary keys in `.env.local`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. Install Dependencies
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm install
+```
 
-## Learn More
+### 3. Database Schema Migration & Seeding
 
-To learn more about Next.js, take a look at the following resources:
+Run the database seed script to apply migrations and seed initial categories, products, and store settings into Supabase PostgreSQL:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+node scripts/seed-ecommerce.js
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Run Development Server
 
-## Deploy on Vercel
+```bash
+pnpm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🔑 Key Features
+
+### Customer Experience
+- 100% Responsive, Animated E-Commerce Interface
+- Product Catalog with Image Gallery, Zoom, and Customer Reviews
+- 4-Step Simple Checkout (Address → Payment Method → Review → Confirmation)
+- Real-time Order Tracking & Customer Account Portal (`/account`)
+
+### Admin Dashboard (`/admin`)
+- Analytics & Revenue Overview
+- Product Catalog Management (Stock, Prices, Featured Toggle, Delete)
+- Order Status Management (Pending → Confirmed → Shipped → Delivered → Cancelled)
+- Customer Directory & Store Settings
+
+---
+
+## 🔒 Security & RLS
+
+- Row Level Security enabled across all 11 PostgreSQL tables.
+- Customer Isolation policies restrict customers to accessing only their own profile, addresses, cart items, and orders.
+- Role-based authorization enforced in `middleware.ts` restricting access to `/admin`.

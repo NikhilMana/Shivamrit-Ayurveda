@@ -1,26 +1,121 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+  
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  
+  /* Core Luxury Skincare Palette */
+  --color-brand-cream: #FFF8F4;
+  --color-brand-cream-alt: #F7EEE7;
+  --color-brand-accent-pink: #FFD8D8;
+  --color-brand-accent-rose: #FCBABA;
+  --color-brand-gold: #C89B3C;
+  --color-brand-espresso: #3A2B28;
+  --color-brand-taupe: #6D5A56;
+
+  /* Botanical Accents */
+  --color-botanical-green: #3E5C38;
+  --color-botanical-saffron: #D97724;
+  --color-botanical-hibiscus: #B93847;
+  --color-botanical-wood: #8B5E3C;
+  --color-botanical-amber: #D48C2E;
+
+  /* Compatibility & Legacy tokens mapped to luxury palette */
+  --color-brand-off-white: #FFF8F4;
+  --color-brand-lime-green: #C89B3C;
+  --color-brand-olive-green: #3E5C38;
+  --color-brand-dark-teal: #3A2B28;
+  --color-brand-dark-olive: #FFF8F4;
+
+  --radius-sm: 10px;
+  --radius-md: 20px;
+  --radius-lg: 32px;
+  --radius-xl: 44px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Brand palette mapped to soft cream & warm espresso */
+  --background: #FFF8F4;
+  --foreground: #3A2B28;
+  --card: #FFFFFF;
+  --card-foreground: #3A2B28;
+  --popover: #FFF8F4;
+  --popover-foreground: #3A2B28;
+  
+  /* Primary Action */
+  --primary: #C89B3C; /* Warm Gold */
+  --primary-foreground: #FFF8F4;
+  
+  /* Secondary / Muted */
+  --secondary: #F7EEE7;
+  --secondary-foreground: #3A2B28;
+  --muted: #F7EEE7;
+  --muted-foreground: #6D5A56;
+  
+  /* Accent */
+  --accent: #FFD8D8;
+  --accent-foreground: #3A2B28;
+  
+  /* System */
+  --destructive: #B93847;
+  --destructive-foreground: #FFF8F4;
+  --border: rgba(58, 43, 40, 0.1);
+  --input: rgba(58, 43, 40, 0.1);
+  --ring: #C89B3C;
+  
+  --radius: 20px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-[#FFF8F4] text-[#3A2B28] font-sans antialiased selection:bg-[#FFD8D8] selection:text-[#3A2B28] overflow-x-hidden;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-light tracking-wide text-[#3A2B28];
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Luxury Utilities */
+.glass-panel {
+  @apply bg-[#FFF8F4]/80 backdrop-blur-md border border-[#C89B3C]/20 shadow-[0_15px_45px_rgba(58,43,40,0.06)];
+}
+
+.card-luxury {
+  @apply bg-white rounded-[32px] border border-[#C89B3C]/25 shadow-[0_20px_50px_rgba(58,43,40,0.06)] transition-all duration-500 hover:shadow-[0_30px_70px_rgba(200,155,60,0.15)];
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(200, 155, 60, 0.25);
+}
+
+.hover-lift {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
 }
