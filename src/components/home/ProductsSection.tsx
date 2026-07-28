@@ -25,7 +25,6 @@ function StickyProductCard({ product, index, total, progress, onOpenDetails }: C
   const targetScale = 1 - (total - 1 - index) * 0.04;
 
   const scale = useTransform(progress, [cardStart, cardEnd], [1, targetScale]);
-  const opacity = useTransform(progress, [cardStart, cardStart + 0.15], [0.85, 1]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,13 +47,12 @@ function StickyProductCard({ product, index, total, progress, onOpenDetails }: C
       <motion.div
         style={{
           scale,
-          opacity,
           top: `calc(58px + ${index * 6}px)`,
-          willChange: "transform, opacity",
+          willChange: "transform",
         }}
         className={`relative w-full max-w-4xl min-h-[58vh] sm:min-h-[66vh] max-h-[72vh] rounded-[24px] sm:rounded-[36px] border border-[#C89B3C]/30 ${
           isEven ? "bg-white" : "bg-[#FFF8F4]"
-        } p-3.5 sm:p-6 shadow-[0_15px_45px_rgba(58,43,40,0.07)] overflow-hidden group flex flex-col justify-between transition-all duration-300`}
+        } p-3.5 sm:p-6 shadow-[0_15px_45px_rgba(58,43,40,0.12)] overflow-hidden group flex flex-col justify-between transition-all duration-300`}
       >
         {/* Soft Accent Background Glow */}
         <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#FFD8D8]/20 rounded-full blur-2xl pointer-events-none" />
