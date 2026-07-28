@@ -7,9 +7,14 @@ import { Search, ShoppingBag, Menu, X, ArrowRight, AtSign, Phone, User, Grid } f
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
 
+import { usePathname } from "next/navigation";
+
 const emptySubscribe = () => () => {};
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
+
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,11 +26,11 @@ export default function Navbar() {
   const { totalItems } = getTotals();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const threshold = typeof window !== "undefined" ? window.innerHeight * 0.95 : 800;
-    if (latest > threshold) {
+    if (!isHomePage) {
       setIsScrolled(true);
     } else {
-      setIsScrolled(false);
+      const threshold = typeof window !== "undefined" ? window.innerHeight * 0.95 : 800;
+      setIsScrolled(latest > threshold);
     }
   });
 
@@ -34,13 +39,15 @@ export default function Navbar() {
     toggleCart();
   };
 
+  const hasBackground = !isHomePage || isScrolled;
+
   return (
     <>
       {/* Floating Glassmorphism Navbar */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 flex py-1.5 sm:py-2.5 px-4 sm:px-8 md:px-12 items-center justify-between transition-all duration-500 ${
-          isScrolled
-            ? "bg-[#FFF8F4]/90 backdrop-blur-xl border-b border-[#C89B3C]/20 shadow-[0_10px_30px_rgba(58,43,40,0.06)]"
+          hasBackground
+            ? "bg-[#FFF8F4]/95 backdrop-blur-xl border-b border-[#C89B3C]/20 shadow-[0_10px_30px_rgba(58,43,40,0.06)]"
             : "bg-transparent"
         }`}
       >

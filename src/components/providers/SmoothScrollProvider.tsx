@@ -25,6 +25,11 @@ export default function SmoothScrollProvider({
       touchMultiplier: isMobile ? 0.8 : 1.2,
     });
 
+    // Attach Lenis instance to window for global access
+    if (typeof window !== "undefined") {
+      (window as any).__lenis = lenis;
+    }
+
     lenis.on("scroll", ScrollTrigger.update);
 
     gsap.ticker.add((time) => {
@@ -34,6 +39,9 @@ export default function SmoothScrollProvider({
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      if (typeof window !== "undefined") {
+        delete (window as any).__lenis;
+      }
       lenis.destroy();
     };
   }, []);

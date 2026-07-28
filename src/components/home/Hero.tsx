@@ -115,66 +115,40 @@ export default function Hero() {
     };
   }, [drawFrame]);
 
-  // Initial Auto-Scroll & Animation until the first product section slides into view
+  // Initial Auto-Scroll to First Product Section on load via Lenis
   useEffect(() => {
     if (!isInitialFrameReady || hasIntroPlayedRef.current) return;
 
-    let animationFrameId: number;
-    let lastTime = performance.now();
-    const frameInterval = 1000 / 24; // ~24 FPS
-
-    const handleUserInteraction = () => {
+    // Trigger auto-scroll only if user is at top of page
+    if (typeof window !== "undefined" && window.scrollY > 100) {
       hasIntroPlayedRef.current = true;
-    };
+      return;
+    }
 
-    window.addEventListener("touchstart", handleUserInteraction, { passive: true });
-    window.addEventListener("wheel", handleUserInteraction, { passive: true });
-    window.addEventListener("keydown", handleUserInteraction, { passive: true });
-
-    const animate = (now: number) => {
+    const timer = setTimeout(() => {
       if (hasIntroPlayedRef.current) return;
 
-      const elapsed = now - lastTime;
-      const productsElem = document.getElementById("products-section");
-      const targetY = productsElem ? Math.max(0, productsElem.offsetTop - 70) : window.innerHeight * 0.9;
+      const lenis = (window as any).__lenis;
+      const targetElem = document.getElementById("products-section");
 
-      if (elapsed >= frameInterval) {
-        lastTime = now - (elapsed % frameInterval);
-
-        // Advance animation frame
-        if (currentFrameRef.current < TOTAL_FRAMES - 1) {
-          currentFrameRef.current += 1;
-          drawFrame(currentFrameRef.current);
-        }
-
-        // Smoothly auto-scroll page down towards first product card
-        if (typeof window !== "undefined") {
-          const currentY = window.scrollY;
-          if (currentY < targetY - 5) {
-            const nextY = Math.min(targetY, currentY + (targetY - currentY) * 0.08 + 2.5);
-            window.scrollTo(0, nextY);
-          } else {
-            // First product card reached! Stop auto-scroll.
-            hasIntroPlayedRef.current = true;
-            return;
-          }
+      if (targetElem) {
+        hasIntroPlayedRef.current = true;
+        if (lenis) {
+          lenis.scrollTo(targetElem, {
+            offset: -60,
+            duration: 3.5,
+            easing: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
+          });
+        } else {
+          targetElem.scrollIntoView({ behavior: "smooth" });
         }
       }
+    }, 500);
 
-      animationFrameId = requestAnimationFrame(animate);
-    };
+    return () => clearTimeout(timer);
+  }, [isInitialFrameReady]);
 
-    animationFrameId = requestAnimationFrame(animate);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("touchstart", handleUserInteraction);
-      window.removeEventListener("wheel", handleUserInteraction);
-      window.removeEventListener("keydown", handleUserInteraction);
-    };
-  }, [isInitialFrameReady, drawFrame]);
-
-  // GSAP ScrollTrigger for smooth scrub scrolling when user scrolls manually
+  // GSAP ScrollTrigger for smooth scrub scrolling (scrolling up/down scrubs through sequence)
   useEffect(() => {
     const st = ScrollTrigger.create({
       start: 0,
