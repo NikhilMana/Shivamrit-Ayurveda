@@ -189,7 +189,7 @@ export default function CurvedReviewShowcase() {
                     src={review.image}
                     alt={review.product}
                     fill
-                    priority={i === 2}
+                    priority={true}
                     sizes="(max-width: 768px) 80vw, 30vw"
                     className="object-cover"
                   />

@@ -50,16 +50,17 @@ function StickyProductCard({ product, index, total, progress, onOpenDetails }: C
           scale,
           opacity,
           top: `calc(58px + ${index * 6}px)`,
+          willChange: "transform, opacity",
         }}
         className={`relative w-full max-w-4xl min-h-[58vh] sm:min-h-[66vh] max-h-[72vh] rounded-[24px] sm:rounded-[36px] border border-[#C89B3C]/30 ${
-          isEven ? "bg-white" : "bg-[#F7EEE7]"
-        } p-3.5 sm:p-6 shadow-[0_15px_45px_rgba(58,43,40,0.07)] backdrop-blur-2xl overflow-hidden group flex flex-col justify-between transition-all duration-300`}
+          isEven ? "bg-white" : "bg-[#FFF8F4]"
+        } p-3.5 sm:p-6 shadow-[0_15px_45px_rgba(58,43,40,0.07)] overflow-hidden group flex flex-col justify-between transition-all duration-300`}
       >
         {/* Soft Accent Background Glow */}
-        <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#FFD8D8]/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#FFD8D8]/20 rounded-full blur-2xl pointer-events-none" />
 
         {/* Top Header Row */}
-        <div className="flex items-center justify-between border-b border-[#3A2B28]/10 pb-2">
+        <div className="flex items-center justify-between border-b border-[#3A2B28]/10 pb-2 relative z-10">
           <div className="flex items-center gap-2">
             <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] font-semibold text-[#3A2B28] bg-[#FFD8D8]/70 border border-[#FCBABA] px-2.5 py-0.5 rounded-full shadow-xs">
               {product.category}
@@ -75,20 +76,20 @@ function StickyProductCard({ product, index, total, progress, onOpenDetails }: C
           </span>
         </div>
 
-        {/* Hero Product Image Container */}
+        {/* Hero Product Image Container (Eagerly preloaded, crisp render) */}
         <div className="relative flex-1 w-full my-1.5 rounded-[18px] sm:rounded-[24px] overflow-hidden bg-gradient-to-b from-[#FFF8F4] to-[#F7EEE7]/70 border border-[#C89B3C]/20 flex items-center justify-center group/img shadow-inner min-h-[190px] sm:min-h-[260px]">
           <Image
             src={product.images[0]}
             alt={product.name}
             fill
-            priority={index === 0}
+            priority={true}
             sizes="(max-width: 768px) 90vw, 60vw"
-            className="object-contain p-2 sm:p-4 transition-transform duration-700 group-hover/img:scale-105"
+            className="object-contain p-2 sm:p-4 transition-transform duration-500 group-hover/img:scale-105"
           />
         </div>
 
         {/* Key Benefits Row */}
-        <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 my-1">
+        <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 my-1 relative z-10">
           {product.benefits.slice(0, 3).map((benefit, i) => (
             <span
               key={i}
@@ -101,7 +102,7 @@ function StickyProductCard({ product, index, total, progress, onOpenDetails }: C
         </div>
 
         {/* Bottom Info & Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-[#3A2B28]/10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-[#3A2B28]/10 relative z-10">
           
           {/* Product Name & Price */}
           <div>
@@ -218,6 +219,7 @@ function ProductDetailsModal({ product, onClose }: ModalProps) {
             src={product.images[0]}
             alt={product.name}
             fill
+            priority={true}
             className="object-contain p-3"
           />
         </div>
