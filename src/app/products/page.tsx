@@ -278,7 +278,7 @@ export default function ProductsPage() {
 
                       <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium mb-4">
                         <Truck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                        <span>FREE Delivery in 2-3 Business Days</span>
+                        <span>FREE Delivery in 5-7 Days</span>
                       </div>
 
                       {/* Action Buttons */}
@@ -390,7 +390,7 @@ export default function ProductsPage() {
                       <div className="mt-3 space-y-1 text-[11px] text-emerald-700 font-medium">
                         <div className="flex items-center gap-1">
                           <Truck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                          <span>FREE Express Shipping</span>
+                          <span>FREE Delivery (5-7 Days)</span>
                         </div>
                         <div className="flex items-center gap-1 text-gray-600">
                           <ShieldCheck className="w-3.5 h-3.5 text-[#C89B3C] shrink-0" />

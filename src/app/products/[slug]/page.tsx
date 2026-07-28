@@ -285,7 +285,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             </div>
 
             <p className="text-xs text-center text-[#6D5A56] flex items-center justify-center gap-1.5 uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-[#3E5C38]" /> 100% Authentic Formulations • Free Shipping Across India
+              <ShieldCheck className="w-4 h-4 text-[#3E5C38]" /> 100% Authentic Formulations • Free Delivery in 5-7 Days
             </p>
           </div>
         </div>
