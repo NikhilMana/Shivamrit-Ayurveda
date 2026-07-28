@@ -136,7 +136,7 @@ export default function Hero() {
         if (lenis) {
           lenis.scrollTo(targetElem, {
             offset: -60,
-            duration: 3.5,
+            duration: 5.5,
             easing: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
           });
         } else {
