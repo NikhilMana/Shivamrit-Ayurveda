@@ -137,7 +137,7 @@ export default function CartDrawer() {
                   </span>
                 </div>
                 <p className="text-[11px] text-[#6D5A56] leading-tight">
-                  Taxes and shipping calculated at checkout. Free shipping across India.
+                  Taxes and shipping calculated at checkout. Standard delivery charge ₹49 for all orders across India.
                 </p>
                 <Link
                   href="/checkout"

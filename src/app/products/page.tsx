@@ -278,7 +278,7 @@ export default function ProductsPage() {
 
                       <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium mb-4">
                         <Truck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                        <span>FREE Delivery in 5-7 Days</span>
+                        <span>Standard Delivery in 5-7 Days (₹49)</span>
                       </div>
 
                       {/* Action Buttons */}
@@ -390,7 +390,7 @@ export default function ProductsPage() {
                       <div className="mt-3 space-y-1 text-[11px] text-emerald-700 font-medium">
                         <div className="flex items-center gap-1">
                           <Truck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                          <span>FREE Delivery (5-7 Days)</span>
+                          <span>Standard Delivery (5-7 Days, ₹49)</span>
                         </div>
                         <div className="flex items-center gap-1 text-gray-600">
                           <ShieldCheck className="w-3.5 h-3.5 text-[#C89B3C] shrink-0" />
@@ -442,8 +442,8 @@ export default function ProductsPage() {
               <Truck className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-serif text-sm font-bold text-[#3A2B28]">Free Express Delivery</h4>
-              <p className="text-xs text-[#6D5A56]">On all prepaid orders nationwide</p>
+              <h4 className="font-serif text-sm font-bold text-[#3A2B28]">Standard Shipping (5-7 Days)</h4>
+              <p className="text-xs text-[#6D5A56]">Flat ₹49 delivery charge on all orders</p>
             </div>
           </div>
 

@@ -58,7 +58,7 @@ export default function CheckoutPage() {
     document.body.appendChild(script);
   }, []);
 
-  const shippingCharge = totalPrice > 499 ? 0 : 50;
+  const shippingCharge = 49;
   const finalTotal = totalPrice + shippingCharge;
 
   const handleNextStep1 = (e: React.FormEvent) => {
@@ -563,14 +563,8 @@ export default function CheckoutPage() {
                   <span>₹{totalPrice}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span>
-                    {shippingCharge === 0 ? (
-                      <span className="text-[#166534] font-bold">FREE</span>
-                    ) : (
-                      `₹${shippingCharge}`
-                    )}
-                  </span>
+                  <span>Standard Delivery Charge</span>
+                  <span className="font-bold text-[#1a392a]">₹49</span>
                 </div>
               </div>
 
