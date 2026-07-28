@@ -13,14 +13,16 @@ export default function SmoothScrollProvider({
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
     const lenis = new Lenis({
-      duration: 1.0,
+      duration: isMobile ? 1.4 : 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 1.5,
+      touchMultiplier: isMobile ? 0.8 : 1.2,
     });
 
     lenis.on("scroll", ScrollTrigger.update);
