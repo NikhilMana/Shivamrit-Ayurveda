@@ -171,8 +171,44 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         ).toFixed(1)
       : "5.0";
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.images.map((img: string) =>
+      img.startsWith("http") ? img : `https://www.shivamritayurveda.in${img}`
+    ),
+    "description": product.shortDescription,
+    "sku": product.id,
+    "brand": {
+      "@type": "Brand",
+      "name": "Shivamrit Ayurveda"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": `https://www.shivamritayurveda.in/products/${product.slug}`,
+      "priceCurrency": "INR",
+      "price": product.offerPrice || product.price,
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": "https://schema.org/InStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Shivamrit Ayurveda"
+      }
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": avgRating,
+      "reviewCount": Math.max(1, reviews.length)
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FFF8F4] text-[#3A2B28] pt-32 pb-24 px-8 md:px-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <div className="container mx-auto max-w-6xl">
         <div className="flex flex-col lg:flex-row gap-12 xl:gap-20 mb-16">
           {/* Gallery Left */}

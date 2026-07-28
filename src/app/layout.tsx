@@ -6,6 +6,7 @@ import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import QueryProvider from "@/components/providers/QueryProvider";
 import Cursor from "@/components/ui/Cursor";
 import CartDrawer from "@/components/cart/CartDrawer";
+import JsonLd from "@/components/seo/JsonLd";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -20,29 +21,36 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://shivamrit-ayurveda.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.shivamritayurveda.in";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Shivamrit Ayurveda | Premium Ayurvedic Hair & Skin Formulations",
+    default: "Shivamrit Ayurveda | Pure Authentic Botanical Wellness & Hair Care",
     template: "%s | Shivamrit Ayurveda",
   },
   description:
-    "Discover authentic, 100% natural Ayurvedic hair care oils, anti-dandruff shampoos, saffron face serums, and pure neem combs. Handcrafted traditional wellness for modern living.",
+    "Discover authentic 100% natural Ayurvedic hair care oils, anti-dandruff shampoos, Kumkumadi face serums, pure neem combs, and herbal soaps. Handcrafted ancient botanical remedies for hair growth, scalp healing, and glowing skin.",
   keywords: [
     "Shivamrit Ayurveda",
     "Ayurvedic Hair Oil",
-    "Kesh Amrit",
-    "Kesh Kalpa Shampoo",
+    "Kesh Amrit Hair Oil",
+    "Kesh Kalpa Anti Dandruff Shampoo",
     "Twak Amrit Face Serum",
-    "Kumkumadi Oil",
-    "Pure Neem Comb",
-    "Natural Skin Care",
-    "Organic Ayurvedic Products",
+    "Kumkumadi Face Oil",
+    "Pure Neem Wood Comb",
+    "Greeshm Soap",
+    "Organic Ayurvedic Cosmetics",
+    "Ayurvedic Scalp Treatment",
+    "Natural Beauty Products India",
   ],
   authors: [{ name: "Shivamrit Ayurveda" }],
   creator: "Shivamrit Ayurveda",
+  publisher: "Shivamrit Ayurveda",
+  category: "Health & Beauty",
+  alternates: {
+    canonical: siteUrl,
+  },
   icons: {
     icon: "/assets/logo.png",
     shortcut: "/assets/logo.png",
@@ -52,22 +60,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: siteUrl,
-    title: "Shivamrit Ayurveda | Handcrafted Pure Ayurvedic Formulations",
+    title: "Shivamrit Ayurveda | Handcrafted Pure Botanical Formulations",
     description:
-      "Transform your hair and skin health with centuries-old Ayurvedic wisdom. 100% authentic, paraben-free, and cruelty-free.",
+      "Transform your hair and skin health with centuries-old Ayurvedic wisdom. 100% authentic, paraben-free, sulphate-free, and cruelty-free.",
     siteName: "Shivamrit Ayurveda",
     images: [
       {
         url: "/assets/combo pack.png",
         width: 1200,
         height: 630,
-        alt: "Shivamrit Ayurveda Essential Ritual Kit",
+        alt: "Shivamrit Ayurveda Sacred Botanical Formulations",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shivamrit Ayurveda | Sacred Ayurvedic Formulations",
+    title: "Shivamrit Ayurveda | Pure Botanical Wellness",
     description:
       "Handcrafted natural hair oil, anti-dandruff shampoo, kumkumadi face serum, and neem combs.",
     images: ["/assets/combo pack.png"],
@@ -75,6 +83,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
@@ -88,6 +103,9 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${cormorant.variable} h-full antialiased dark`}
     >
+      <head>
+        <JsonLd />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden">
         <QueryProvider>
           <SmoothScrollProvider>
