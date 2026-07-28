@@ -60,11 +60,11 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#3A2B28] pt-28 sm:pt-36 pb-24 px-4 sm:px-8 md:px-12">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#FDFBF7] text-[#3A2B28] pt-28 sm:pt-36 pb-24 px-4 md:px-12 w-full overflow-x-hidden">
+      <div className="container mx-auto max-w-6xl">
         
         {/* Amazon-Style Header */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#3A2B28]/10 pb-8">
+        <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#3A2B28]/10 pb-6 sm:pb-8">
           <div>
             <span className="text-xs uppercase tracking-[0.35em] text-[#C89B3C] font-semibold mb-2 block">
               100% Pure Authentic Formulations
@@ -72,7 +72,7 @@ export default function ProductsPage() {
             <h1 className="font-serif text-3xl sm:text-5xl font-light uppercase tracking-wide text-[#3A2B28]">
               Our Products
             </h1>
-            <p className="text-sm text-[#6D5A56] font-light mt-1 max-w-xl">
+            <p className="text-xs sm:text-sm text-[#6D5A56] font-light mt-1 max-w-xl">
               Explore our complete catalogue of handcrafted Ayurvedic elixirs, oils, and body wellness rituals.
             </p>
           </div>
@@ -85,7 +85,7 @@ export default function ProductsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products, ingredients..."
-                className="w-full pl-11 pr-4 py-3 rounded-full border border-[#C89B3C]/30 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C89B3C] placeholder-gray-400 shadow-xs"
+                className="w-full pl-11 pr-4 py-2.5 sm:py-3 rounded-full border border-[#C89B3C]/30 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C89B3C] placeholder-gray-400 shadow-xs"
               />
               <Search className="w-4 h-4 text-[#C89B3C] absolute left-4 top-1/2 -translate-y-1/2" />
             </div>
@@ -93,38 +93,40 @@ export default function ProductsPage() {
         </div>
 
         {/* Filter & View Bar (Amazon Controls) */}
-        <div className="mb-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-3 sm:p-4 rounded-2xl border border-[#C89B3C]/20 shadow-xs">
+        <div className="mb-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-3 sm:p-4 rounded-2xl border border-[#C89B3C]/20 shadow-xs w-full overflow-hidden">
           
-          {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                  selectedCategory === cat
-                    ? "bg-[#3A2B28] text-white shadow-sm"
-                    : "bg-[#FFF8F4] text-[#6D5A56] hover:bg-[#F7EEE7] border border-[#C89B3C]/20"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          {/* Category Tabs (Horizontal Scrollable inside container) */}
+          <div className="w-full sm:w-auto min-w-0 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-semibold transition-all shrink-0 ${
+                    selectedCategory === cat
+                      ? "bg-[#3A2B28] text-white shadow-sm"
+                      : "bg-[#FFF8F4] text-[#6D5A56] hover:bg-[#F7EEE7] border border-[#C89B3C]/20"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Sort & Layout Controls */}
-          <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
             <span className="text-xs text-[#6D5A56] font-mono shrink-0">
-              {filteredProducts.length} items found
+              {filteredProducts.length} items
             </span>
 
             {/* Sort Dropdown */}
-            <div className="flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4 text-[#C89B3C]" />
+            <div className="flex items-center gap-1.5">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-[#C89B3C] shrink-0" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-[#FFF8F4] border border-[#C89B3C]/30 rounded-xl px-3 py-1.5 text-xs text-[#3A2B28] font-medium focus:outline-none"
+                className="bg-[#FFF8F4] border border-[#C89B3C]/30 rounded-xl px-2.5 py-1.5 text-xs text-[#3A2B28] font-medium focus:outline-none max-w-[130px] sm:max-w-none"
               >
                 <option value="featured">Sort: Featured</option>
                 <option value="price-low">Price: Low to High</option>
@@ -134,7 +136,7 @@ export default function ProductsPage() {
             </div>
 
             {/* Grid vs List View Switcher */}
-            <div className="flex items-center gap-1 bg-[#FFF8F4] border border-[#C89B3C]/20 p-1 rounded-xl">
+            <div className="flex items-center gap-1 bg-[#FFF8F4] border border-[#C89B3C]/20 p-1 rounded-xl shrink-0">
               <button
                 onClick={() => setViewMode("grid")}
                 className={`p-1.5 rounded-lg transition-colors ${
@@ -149,7 +151,7 @@ export default function ProductsPage() {
                 className={`p-1.5 rounded-lg transition-colors ${
                   viewMode === "list" ? "bg-[#3A2B28] text-white" : "text-[#6D5A56] hover:text-[#3A2B28]"
                 }`}
-                title="Amazon List View"
+                title="List View"
               >
                 <List className="w-4 h-4" />
               </button>
@@ -275,7 +277,7 @@ export default function ProductsPage() {
                       </div>
 
                       <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium mb-4">
-                        <Truck className="w-3.5 h-3.5 text-emerald-700" />
+                        <Truck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                         <span>FREE Delivery in 2-3 Business Days</span>
                       </div>
 
@@ -313,7 +315,7 @@ export default function ProductsPage() {
               return (
                 <div
                   key={product.id}
-                  className="group bg-white rounded-3xl border border-[#C89B3C]/25 p-4 sm:p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row gap-6 items-center"
+                  className="group bg-white rounded-3xl border border-[#C89B3C]/25 p-4 sm:p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row gap-6 items-center overflow-hidden"
                 >
                   {/* Left Product Image */}
                   <div className="relative w-full md:w-64 h-56 rounded-2xl bg-gradient-to-b from-[#FFF8F4] to-[#F7EEE7]/70 p-4 border border-[#C89B3C]/20 flex items-center justify-center shrink-0">
@@ -322,7 +324,7 @@ export default function ProductsPage() {
                         src={product.images[0]}
                         alt={product.name}
                         fill
-                        sizes="256px"
+                        sizes="(max-width: 768px) 100vw, 256px"
                         className="object-contain p-2 group-hover:scale-105 transition-transform duration-500"
                       />
                     </Link>
@@ -332,7 +334,7 @@ export default function ProductsPage() {
                   </div>
 
                   {/* Center Content */}
-                  <div className="flex-1 space-y-2">
+                  <div className="flex-1 space-y-2 w-full min-w-0">
                     {/* Ratings */}
                     <div className="flex items-center gap-1.5">
                       <div className="flex text-[#C89B3C]">
@@ -367,7 +369,7 @@ export default function ProductsPage() {
                     </div>
                   </div>
 
-                  {/* Right Commercial Actions (Amazon Sidebar Style) */}
+                  {/* Right Commercial Actions */}
                   <div className="w-full md:w-64 p-4 rounded-2xl bg-[#FFF8F4] border border-[#C89B3C]/20 shrink-0 flex flex-col justify-between space-y-4">
                     <div>
                       <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
@@ -387,11 +389,11 @@ export default function ProductsPage() {
 
                       <div className="mt-3 space-y-1 text-[11px] text-emerald-700 font-medium">
                         <div className="flex items-center gap-1">
-                          <Truck className="w-3.5 h-3.5 text-emerald-700" />
+                          <Truck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                           <span>FREE Express Shipping</span>
                         </div>
                         <div className="flex items-center gap-1 text-gray-600">
-                          <ShieldCheck className="w-3.5 h-3.5 text-[#C89B3C]" />
+                          <ShieldCheck className="w-3.5 h-3.5 text-[#C89B3C] shrink-0" />
                           <span>In Stock • Direct from Sanctuary</span>
                         </div>
                       </div>
@@ -426,7 +428,7 @@ export default function ProductsPage() {
         {/* Amazon-Style Customer Guarantees Footer Bar */}
         <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 rounded-3xl bg-white border border-[#C89B3C]/20 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-[#FFF8F4] text-[#C89B3C] border border-[#C89B3C]/20">
+            <div className="p-3 rounded-2xl bg-[#FFF8F4] text-[#C89B3C] border border-[#C89B3C]/20 shrink-0">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
@@ -436,7 +438,7 @@ export default function ProductsPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-[#FFF8F4] text-[#C89B3C] border border-[#C89B3C]/20">
+            <div className="p-3 rounded-2xl bg-[#FFF8F4] text-[#C89B3C] border border-[#C89B3C]/20 shrink-0">
               <Truck className="w-6 h-6" />
             </div>
             <div>
@@ -446,7 +448,7 @@ export default function ProductsPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-[#FFF8F4] text-[#C89B3C] border border-[#C89B3C]/20">
+            <div className="p-3 rounded-2xl bg-[#FFF8F4] text-[#C89B3C] border border-[#C89B3C]/20 shrink-0">
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
@@ -456,7 +458,7 @@ export default function ProductsPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-[#FFF8F4] text-[#C89B3C] border border-[#C89B3C]/20">
+            <div className="p-3 rounded-2xl bg-[#FFF8F4] text-[#C89B3C] border border-[#C89B3C]/20 shrink-0">
               <ShoppingBag className="w-6 h-6" />
             </div>
             <div>
