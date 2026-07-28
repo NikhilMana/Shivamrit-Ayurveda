@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const TOTAL_FRAMES = 192;
 
@@ -17,6 +21,7 @@ export default function Hero() {
   const [isInitialFrameReady, setIsInitialFrameReady] = useState(false);
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef(0);
+  const hasIntroPlayedRef = useRef(false);
 
   // Helper to draw a specific frame on canvas with aspect cover scaling
   const drawFrame = useCallback((frameIndex: number) => {
@@ -110,9 +115,9 @@ export default function Hero() {
     };
   }, [drawFrame]);
 
-  // Continuous Auto-Playing Loop (Smooth ~24 FPS playback speed)
+  // Initial Auto-Play ONCE on first load
   useEffect(() => {
-    if (!isInitialFrameReady) return;
+    if (!isInitialFrameReady || hasIntroPlayedRef.current) return;
 
     let animationFrameId: number;
     let lastTime = performance.now();
@@ -121,13 +126,25 @@ export default function Hero() {
     const animate = (now: number) => {
       const elapsed = now - lastTime;
 
-      if (elapsed >= frameInterval) {
-        lastTime = now - (elapsed % frameInterval);
-        currentFrameRef.current = (currentFrameRef.current + 1) % TOTAL_FRAMES;
-        drawFrame(currentFrameRef.current);
+      // Only auto-play if user is at the top of the page
+      if (typeof window !== "undefined" && window.scrollY > 50) {
+        hasIntroPlayedRef.current = true;
+        return;
       }
 
-      animationFrameId = requestAnimationFrame(animate);
+      if (elapsed >= frameInterval) {
+        lastTime = now - (elapsed % frameInterval);
+
+        if (currentFrameRef.current < TOTAL_FRAMES - 1) {
+          currentFrameRef.current += 1;
+          drawFrame(currentFrameRef.current);
+          animationFrameId = requestAnimationFrame(animate);
+        } else {
+          hasIntroPlayedRef.current = true;
+        }
+      } else {
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
 
     animationFrameId = requestAnimationFrame(animate);
@@ -137,6 +154,31 @@ export default function Hero() {
     };
   }, [isInitialFrameReady, drawFrame]);
 
+  // GSAP ScrollTrigger for smooth scrub scrolling (scrolling up/down scrubs through sequence)
+  useEffect(() => {
+    const st = ScrollTrigger.create({
+      start: 0,
+      end: () => window.innerHeight * 1.2,
+      scrub: 0.3,
+      onUpdate: (self) => {
+        // User is scrolling, take over frame control via ScrollTrigger
+        hasIntroPlayedRef.current = true;
+        const targetFrame = Math.min(
+          TOTAL_FRAMES - 1,
+          Math.floor(self.progress * (TOTAL_FRAMES - 1))
+        );
+        if (targetFrame !== currentFrameRef.current) {
+          currentFrameRef.current = targetFrame;
+          drawFrame(targetFrame);
+        }
+      },
+    });
+
+    return () => {
+      st.kill();
+    };
+  }, [drawFrame]);
+
   const loadingPercentage = Math.round((imagesLoadedCount / TOTAL_FRAMES) * 100);
 
   return (
@@ -144,7 +186,7 @@ export default function Hero() {
       id="hero-section"
       className="fixed inset-0 w-full h-screen bg-[#FFF8F4] pointer-events-none select-none z-0"
     >
-      {/* Fixed Canvas Background - Auto-playing visual sequence */}
+      {/* Fixed Canvas Background */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
