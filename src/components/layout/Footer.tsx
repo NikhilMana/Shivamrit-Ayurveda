@@ -64,14 +64,9 @@ export default function Footer() {
           <div className="flex flex-col space-y-1 text-sm text-[#6D5A56]">
             <span className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-[#C89B3C]" />
-              <span>+91 9353912943</span>
+              <span>+91 8123403829</span>
             </span>
-            <span className="text-xs text-[#6D5A56]/70 pl-6">Dr. Prashant Mali</span>
-            <span className="flex items-center gap-2 pt-1">
-              <Phone className="w-4 h-4 text-[#C89B3C]" />
-              <span>+91 7676766440</span>
-            </span>
-            <span className="text-xs text-[#6D5A56]/70 pl-6">Shrishail Bagewadi</span>
+            <span className="text-xs text-[#6D5A56]/70 pl-6">Shashank Mana</span>
           </div>
         </div>
 

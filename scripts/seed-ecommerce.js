@@ -67,7 +67,7 @@ const products = [
     stock: 35,
     featured: true,
     status: "active",
-    size: "30ml",
+    size: "10ml",
     ingredients: "Kashmiri Saffron (Kumkum), Sandalwood (Chandan), Lotus Extract, Yashtimadhu, Pure Cold-pressed Sesame Oil",
     usage_instructions: "Cleanse face thoroughly. Dispense 3-4 drops onto fingertips and warm gently. Press softly onto face and neck until absorbed. Ideal before bedtime.",
     benefits: [
@@ -89,7 +89,7 @@ const products = [
     stock: 100,
     featured: false,
     status: "active",
-    size: "125g",
+    size: "60g",
     ingredients: "Kumkumadi Extract, Sandalwood Oil, Kesar, Manjistha, Coconut Base",
     usage_instructions: "Lather onto wet skin during bath or shower, massage gently over body and face, then rinse with clean water.",
     benefits: [

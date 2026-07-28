@@ -60,7 +60,7 @@ export const products: Product[] = [
     shortDescription: "An exquisite luxurious blend of rare saffron (Kumkum), Sandalwood, Lotus, Yashtimadhu, and pure Sesame Oil structured to reveal timeless, glowing skin clarity.",
     price: 239,
     distributorPrice: 199,
-    size: "30ml",
+    size: "10ml",
     images: [
       "/assets/twak amrit face oil.png",
       "/assets/combo pack.png",
@@ -80,7 +80,7 @@ export const products: Product[] = [
     shortDescription: "Infused with Kumkum, Kesar, Chandana, Manjista, and Palasha to provide premium cooling, natural deep cleansing, and sun-tan removal support during daily baths.",
     price: 50,
     distributorPrice: 35,
-    size: "125g",
+    size: "60g",
     images: [
       "/assets/greeshm soap.png",
       "/assets/combo pack.png",

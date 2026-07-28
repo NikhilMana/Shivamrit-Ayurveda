@@ -280,7 +280,7 @@ export default function Navbar() {
                 </a>
                 <span className="flex items-center gap-1">
                   <Phone className="w-3.5 h-3.5 text-[#C89B3C]" />
-                  <span>+91 9353912943</span>
+                  <span>+91 8123403829</span>
                 </span>
               </div>
               <span>Shivamrit Ayurveda © 2026</span>
