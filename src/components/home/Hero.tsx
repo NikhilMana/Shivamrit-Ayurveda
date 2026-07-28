@@ -1,10 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const TOTAL_FRAMES = 192;
 
@@ -98,9 +94,6 @@ export default function Hero() {
         imagesRef.current[i] = img;
         loadedCount++;
         setImagesLoadedCount(loadedCount);
-        if (i === currentFrameRef.current) {
-          drawFrame(i);
-        }
       };
       if (i === 0) {
         imagesRef.current[0] = firstImg;
@@ -117,28 +110,32 @@ export default function Hero() {
     };
   }, [drawFrame]);
 
-  // Setup GSAP ScrollTrigger animation mapped to viewport scroll position
+  // Continuous Auto-Playing Loop (Smooth ~24 FPS playback speed)
   useEffect(() => {
-    const st = ScrollTrigger.create({
-      start: 0,
-      end: () => window.innerHeight * 1.0,
-      scrub: 0.2,
-      onUpdate: (self) => {
-        const targetFrame = Math.min(
-          TOTAL_FRAMES - 1,
-          Math.floor(self.progress * (TOTAL_FRAMES - 1))
-        );
-        if (targetFrame !== currentFrameRef.current) {
-          currentFrameRef.current = targetFrame;
-          drawFrame(targetFrame);
-        }
-      },
-    });
+    if (!isInitialFrameReady) return;
+
+    let animationFrameId: number;
+    let lastTime = performance.now();
+    const frameInterval = 1000 / 24; // ~24 FPS (~41ms per frame)
+
+    const animate = (now: number) => {
+      const elapsed = now - lastTime;
+
+      if (elapsed >= frameInterval) {
+        lastTime = now - (elapsed % frameInterval);
+        currentFrameRef.current = (currentFrameRef.current + 1) % TOTAL_FRAMES;
+        drawFrame(currentFrameRef.current);
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
 
     return () => {
-      st.kill();
+      cancelAnimationFrame(animationFrameId);
     };
-  }, [drawFrame]);
+  }, [isInitialFrameReady, drawFrame]);
 
   const loadingPercentage = Math.round((imagesLoadedCount / TOTAL_FRAMES) * 100);
 
@@ -147,7 +144,7 @@ export default function Hero() {
       id="hero-section"
       className="fixed inset-0 w-full h-screen bg-[#FFF8F4] pointer-events-none select-none z-0"
     >
-      {/* Fixed Canvas Background - Stays permanently locked in viewport background */}
+      {/* Fixed Canvas Background - Auto-playing visual sequence */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
