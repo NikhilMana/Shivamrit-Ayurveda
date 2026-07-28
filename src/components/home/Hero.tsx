@@ -115,54 +115,72 @@ export default function Hero() {
     };
   }, [drawFrame]);
 
-  // Initial Auto-Play ONCE on first load
+  // Initial Auto-Scroll & Animation until the first product section slides into view
   useEffect(() => {
     if (!isInitialFrameReady || hasIntroPlayedRef.current) return;
 
     let animationFrameId: number;
     let lastTime = performance.now();
-    const frameInterval = 1000 / 24; // ~24 FPS (~41ms per frame)
+    const frameInterval = 1000 / 24; // ~24 FPS
+
+    const handleUserInteraction = () => {
+      hasIntroPlayedRef.current = true;
+    };
+
+    window.addEventListener("touchstart", handleUserInteraction, { passive: true });
+    window.addEventListener("wheel", handleUserInteraction, { passive: true });
+    window.addEventListener("keydown", handleUserInteraction, { passive: true });
 
     const animate = (now: number) => {
-      const elapsed = now - lastTime;
+      if (hasIntroPlayedRef.current) return;
 
-      // Only auto-play if user is at the top of the page
-      if (typeof window !== "undefined" && window.scrollY > 50) {
-        hasIntroPlayedRef.current = true;
-        return;
-      }
+      const elapsed = now - lastTime;
+      const productsElem = document.getElementById("products-section");
+      const targetY = productsElem ? Math.max(0, productsElem.offsetTop - 70) : window.innerHeight * 0.9;
 
       if (elapsed >= frameInterval) {
         lastTime = now - (elapsed % frameInterval);
 
+        // Advance animation frame
         if (currentFrameRef.current < TOTAL_FRAMES - 1) {
           currentFrameRef.current += 1;
           drawFrame(currentFrameRef.current);
-          animationFrameId = requestAnimationFrame(animate);
-        } else {
-          hasIntroPlayedRef.current = true;
         }
-      } else {
-        animationFrameId = requestAnimationFrame(animate);
+
+        // Smoothly auto-scroll page down towards first product card
+        if (typeof window !== "undefined") {
+          const currentY = window.scrollY;
+          if (currentY < targetY - 5) {
+            const nextY = Math.min(targetY, currentY + (targetY - currentY) * 0.08 + 2.5);
+            window.scrollTo(0, nextY);
+          } else {
+            // First product card reached! Stop auto-scroll.
+            hasIntroPlayedRef.current = true;
+            return;
+          }
+        }
       }
+
+      animationFrameId = requestAnimationFrame(animate);
     };
 
     animationFrameId = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("touchstart", handleUserInteraction);
+      window.removeEventListener("wheel", handleUserInteraction);
+      window.removeEventListener("keydown", handleUserInteraction);
     };
   }, [isInitialFrameReady, drawFrame]);
 
-  // GSAP ScrollTrigger for smooth scrub scrolling (scrolling up/down scrubs through sequence)
+  // GSAP ScrollTrigger for smooth scrub scrolling when user scrolls manually
   useEffect(() => {
     const st = ScrollTrigger.create({
       start: 0,
       end: () => window.innerHeight * 1.2,
       scrub: 0.3,
       onUpdate: (self) => {
-        // User is scrolling, take over frame control via ScrollTrigger
-        hasIntroPlayedRef.current = true;
         const targetFrame = Math.min(
           TOTAL_FRAMES - 1,
           Math.floor(self.progress * (TOTAL_FRAMES - 1))
