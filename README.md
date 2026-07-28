@@ -6,14 +6,14 @@ A production-ready, highly scalable, and beautifully animated e-commerce applica
 
 ## 🌿 Tech Stack & Architecture
 
-- **Framework**: Next.js 15 (App Router with Server Components & Route Handlers)
+- **Framework**: Next.js 16 (App Router with Server Components & Route Handlers)
 - **Database**: Supabase PostgreSQL + Row Level Security (RLS)
 - **Authentication**: Supabase Auth (Email & Google OAuth 2.0)
 - **State & Data Fetching**: Zustand (Persisted Cart) & TanStack Query
 - **Payments**: Razorpay Online Payments & Cash on Delivery (COD)
 - **Emails**: Resend Email API
-- **Storage**: Supabase Storage Buckets & Cloudinary
-- **Styling & Motion**: Tailwind CSS & Framer Motion & GSAP
+- **Storage**: Supabase Storage Buckets
+- **Styling & Motion**: Tailwind CSS, Framer Motion & GSAP
 
 ---
 
@@ -26,7 +26,7 @@ Copy `.env.example` to `.env.local`:
 cp .env.example .env.local
 ```
 
-Fill in your Supabase, Razorpay, Resend, and Cloudinary keys in `.env.local`.
+Fill in your Supabase, Razorpay, and Resend keys in `.env.local`.
 
 ### 2. Install Dependencies
 
@@ -70,6 +70,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🔒 Security & RLS
 
-- Row Level Security enabled across all 11 PostgreSQL tables.
+- Row Level Security enabled across all PostgreSQL tables.
 - Customer Isolation policies restrict customers to accessing only their own profile, addresses, cart items, and orders.
 - Role-based authorization enforced in `middleware.ts` restricting access to `/admin`.
