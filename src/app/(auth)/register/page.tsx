@@ -43,8 +43,7 @@ function RegisterForm() {
       setError(error.message);
       setLoading(false);
     } else if (data.session) {
-      router.push(redirect);
-      router.refresh();
+      window.location.href = redirect;
     } else {
       setSuccess(true);
       setLoading(false);
