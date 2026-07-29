@@ -136,14 +136,14 @@ export default function Hero() {
         if (lenis) {
           lenis.scrollTo(targetElem, {
             offset: -60,
-            duration: 5.5,
-            easing: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
+            duration: 6.0,
+            easing: (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
           });
         } else {
           targetElem.scrollIntoView({ behavior: "smooth" });
         }
       }
-    }, 500);
+    }, 1200);
 
     return () => clearTimeout(timer);
   }, [isInitialFrameReady]);
