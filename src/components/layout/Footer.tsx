@@ -61,12 +61,21 @@ export default function Footer() {
             <span>@shivamrit_ayurveda_</span>
           </a>
 
-          <div className="flex flex-col space-y-1 text-sm text-[#6D5A56]">
-            <span className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-[#C89B3C]" />
-              <span>+91 8123403829</span>
-            </span>
-            <span className="text-xs text-[#6D5A56]/70 pl-6">Shashank Mana</span>
+          <div className="flex flex-col space-y-3 text-sm text-[#6D5A56]">
+            <div className="flex flex-col space-y-0.5">
+              <a href="tel:+918123403829" className="flex items-center gap-2 hover:text-[#C89B3C] transition-colors w-fit">
+                <Phone className="w-4 h-4 text-[#C89B3C]" />
+                <span>+91 8123403829</span>
+              </a>
+              <span className="text-xs text-[#6D5A56]/70 pl-6">Dr. Shashank Mana</span>
+            </div>
+            <div className="flex flex-col space-y-0.5">
+              <a href="tel:+919353912943" className="flex items-center gap-2 hover:text-[#C89B3C] transition-colors w-fit">
+                <Phone className="w-4 h-4 text-[#C89B3C]" />
+                <span>+91 9353912943</span>
+              </a>
+              <span className="text-xs text-[#6D5A56]/70 pl-6">Dr. Prashant Mali</span>
+            </div>
           </div>
         </div>
 

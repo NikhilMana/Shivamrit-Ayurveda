@@ -285,10 +285,14 @@ export default function Navbar() {
                   <AtSign className="w-3.5 h-3.5 text-[#C89B3C]" />
                   <span>@shivamrit_ayurveda_</span>
                 </a>
-                <span className="flex items-center gap-1">
+                <a href="tel:+918123403829" className="flex items-center gap-1 hover:text-[#C89B3C] transition-colors">
                   <Phone className="w-3.5 h-3.5 text-[#C89B3C]" />
                   <span>+91 8123403829</span>
-                </span>
+                </a>
+                <a href="tel:+919353912943" className="flex items-center gap-1 hover:text-[#C89B3C] transition-colors">
+                  <Phone className="w-3.5 h-3.5 text-[#C89B3C]" />
+                  <span>+91 9353912943</span>
+                </a>
               </div>
               <span>Shivamrit Ayurveda © 2026</span>
             </div>

@@ -6,7 +6,7 @@ export default function JsonLd() {
     "url": "https://www.shivamritayurveda.in",
     "logo": "https://www.shivamritayurveda.in/assets/logo.png",
     "description": "Pure authentic Ayurvedic hair care oils, anti-dandruff shampoos, kumkumadi face serums, neem combs, and herbal soaps.",
-    "telephone": "+91 8123403829",
+    "telephone": ["+91 8123403829", "+91 9353912943"],
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "IN"
@@ -34,7 +34,7 @@ export default function JsonLd() {
     "name": "Shivamrit Ayurveda Store",
     "image": "https://www.shivamritayurveda.in/assets/combo pack.png",
     "url": "https://www.shivamritayurveda.in",
-    "telephone": "+91 8123403829",
+    "telephone": ["+91 8123403829", "+91 9353912943"],
     "priceRange": "₹₹",
     "currenciesAccepted": "INR",
     "paymentAccepted": "Cash, Credit Card, Razorpay, UPI",
