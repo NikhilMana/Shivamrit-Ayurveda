@@ -135,9 +135,9 @@ export default function Hero() {
         hasIntroPlayedRef.current = true;
         if (lenis) {
           lenis.scrollTo(targetElem, {
-            offset: -40,
+            offset: 0,
             duration: 6.0,
-            easing: (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+            easing: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
           });
         } else {
           targetElem.scrollIntoView({ behavior: "smooth" });
@@ -152,12 +152,14 @@ export default function Hero() {
   useEffect(() => {
     const st = ScrollTrigger.create({
       start: 0,
-      end: () => window.innerHeight * 1.2,
+      end: () => window.innerHeight * 1.6,
       scrub: 0.3,
       onUpdate: (self) => {
+        // Map 0 to 70% of scroll to full 192 frames; hold final frame from 70% to 100%
+        const normalizedProgress = Math.min(1, self.progress / 0.7);
         const targetFrame = Math.min(
           TOTAL_FRAMES - 1,
-          Math.floor(self.progress * (TOTAL_FRAMES - 1))
+          Math.floor(normalizedProgress * (TOTAL_FRAMES - 1))
         );
         if (targetFrame !== currentFrameRef.current) {
           currentFrameRef.current = targetFrame;
