@@ -134,29 +134,17 @@ export default function Hero() {
       if (targetElem) {
         hasIntroPlayedRef.current = true;
         if (lenis) {
-          // Step 1: Play canvas sequence down to final frame 191
-          lenis.scrollTo(window.innerHeight * 1.12, {
-            duration: 3.6,
-            easing: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
-            onComplete: () => {
-              // Step 2: 0.5 second (500ms) hold pause on final frame
-              setTimeout(() => {
-                // Step 3: Scroll to first product section with -110px offset so nothing is cut off under navbar
-                lenis.scrollTo(targetElem, {
-                  offset: -110,
-                  duration: 2.2,
-                  easing: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
-                });
-              }, 500);
-            },
+          lenis.scrollTo(targetElem, {
+            offset: 0,
+            duration: 7.5,
+            // Cubic ease-in-out for extra gentle deceleration at the end of the scroll
+            easing: (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
           });
         } else {
-          setTimeout(() => {
-            targetElem.scrollIntoView({ behavior: "smooth" });
-          }, 500);
+          targetElem.scrollIntoView({ behavior: "smooth" });
         }
       }
-    }, 400);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [isInitialFrameReady]);
@@ -165,11 +153,11 @@ export default function Hero() {
   useEffect(() => {
     const st = ScrollTrigger.create({
       start: 0,
-      end: () => window.innerHeight * 1.6,
-      scrub: 0.3,
+      end: () => window.innerHeight * 1.8,
+      scrub: 0.4,
       onUpdate: (self) => {
-        // Map 0 to 70% of scroll to full 192 frames; hold final frame from 70% to 100%
-        const normalizedProgress = Math.min(1, self.progress / 0.7);
+        // Map 0 to 65% of scroll to full 192 frames; hold final frame gently from 65% to 100%
+        const normalizedProgress = Math.min(1, self.progress / 0.65);
         const targetFrame = Math.min(
           TOTAL_FRAMES - 1,
           Math.floor(normalizedProgress * (TOTAL_FRAMES - 1))
