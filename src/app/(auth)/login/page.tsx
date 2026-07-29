@@ -39,10 +39,13 @@ function LoginForm() {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://www.shivamritayurveda.in";
+    const callbackOrigin = origin.includes("localhost") && process.env.NODE_ENV === "production" ? "https://www.shivamritayurveda.in" : origin;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(redirect)}`,
+        redirectTo: `${callbackOrigin}/api/auth/callback?next=${encodeURIComponent(redirect)}`,
       },
     });
 

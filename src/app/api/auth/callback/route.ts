@@ -7,6 +7,15 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/";
 
+  // Production base URL fallback to prevent localhost redirects
+  const getBaseUrl = () => {
+    if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+    if (origin && !origin.includes("localhost")) return origin;
+    return process.env.NODE_ENV === "production" ? "https://www.shivamritayurveda.in" : origin;
+  };
+
+  const baseUrl = getBaseUrl();
+
   if (code) {
     const cookieStore = await cookies();
     const supabase = createServerClient(
@@ -33,15 +42,7 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      const forwardedHost = request.headers.get("x-forwarded-host");
-      const isLocalEnv = process.env.NODE_ENV === "development";
-
-      let redirectUrl = `${origin}${next}`;
-      if (!isLocalEnv && forwardedHost) {
-        redirectUrl = `https://${forwardedHost}${next}`;
-      }
-
-      const response = NextResponse.redirect(redirectUrl);
+      const response = NextResponse.redirect(`${baseUrl}${next}`);
 
       // Copy session cookies onto response header to ensure browser stores them
       cookieStore.getAll().forEach((c) => {
@@ -54,5 +55,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth-callback-failed`);
+  return NextResponse.redirect(`${baseUrl}/login?error=auth-callback-failed`);
 }

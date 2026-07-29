@@ -18,8 +18,11 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError(null);
 
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://www.shivamritayurveda.in";
+    const callbackOrigin = origin.includes("localhost") && process.env.NODE_ENV === "production" ? "https://www.shivamritayurveda.in" : origin;
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/api/auth/callback?next=/account`,
+      redirectTo: `${callbackOrigin}/api/auth/callback?next=/account`,
     });
 
     if (error) {
