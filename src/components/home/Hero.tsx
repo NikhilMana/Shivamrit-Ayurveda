@@ -134,16 +134,29 @@ export default function Hero() {
       if (targetElem) {
         hasIntroPlayedRef.current = true;
         if (lenis) {
-          lenis.scrollTo(targetElem, {
-            offset: 0,
-            duration: 6.0,
+          // Step 1: Play canvas sequence down to final frame 191
+          lenis.scrollTo(window.innerHeight * 1.12, {
+            duration: 3.6,
             easing: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
+            onComplete: () => {
+              // Step 2: 0.5 second (500ms) hold pause on final frame
+              setTimeout(() => {
+                // Step 3: Scroll to first product section with -110px offset so nothing is cut off under navbar
+                lenis.scrollTo(targetElem, {
+                  offset: -110,
+                  duration: 2.2,
+                  easing: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
+                });
+              }, 500);
+            },
           });
         } else {
-          targetElem.scrollIntoView({ behavior: "smooth" });
+          setTimeout(() => {
+            targetElem.scrollIntoView({ behavior: "smooth" });
+          }, 500);
         }
       }
-    }, 500);
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [isInitialFrameReady]);

@@ -281,7 +281,7 @@ export default function ProductsSection() {
     <section
       ref={targetRef}
       id="products-section"
-      className="relative bg-transparent text-[#3A2B28] px-3 sm:px-8 md:px-12 pt-2 sm:pt-4 pb-12 z-20"
+      className="relative bg-transparent text-[#3A2B28] px-3 sm:px-8 md:px-12 pt-4 sm:pt-8 pb-12 z-20 scroll-mt-24 sm:scroll-mt-28"
     >
       {/* Section Header */}
       <div className="max-w-3xl mx-auto text-center mb-3 sm:mb-4 flex flex-col items-center">
