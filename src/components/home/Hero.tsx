@@ -135,7 +135,7 @@ export default function Hero() {
         hasIntroPlayedRef.current = true;
         if (lenis) {
           lenis.scrollTo(targetElem, {
-            offset: -60,
+            offset: -40,
             duration: 6.0,
             easing: (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
           });
@@ -143,7 +143,7 @@ export default function Hero() {
           targetElem.scrollIntoView({ behavior: "smooth" });
         }
       }
-    }, 1200);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [isInitialFrameReady]);
