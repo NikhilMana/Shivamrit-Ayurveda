@@ -28,7 +28,7 @@ function RegisterForm() {
     const origin = typeof window !== "undefined" ? window.location.origin : "https://www.shivamritayurveda.in";
     const callbackOrigin = origin.includes("localhost") && process.env.NODE_ENV === "production" ? "https://www.shivamritayurveda.in" : origin;
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -42,6 +42,9 @@ function RegisterForm() {
     if (error) {
       setError(error.message);
       setLoading(false);
+    } else if (data.session) {
+      router.push(redirect);
+      router.refresh();
     } else {
       setSuccess(true);
       setLoading(false);

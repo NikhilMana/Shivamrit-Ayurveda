@@ -29,7 +29,11 @@ function LoginForm() {
     });
 
     if (error) {
-      setError(error.message);
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        setError("Your account email is awaiting confirmation. Please check your inbox for the confirmation link, or use 'Sign in with Google'.");
+      } else {
+        setError(error.message);
+      }
       setLoading(false);
     } else {
       router.push(redirect);
