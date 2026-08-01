@@ -45,7 +45,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     queryFn: async () => {
       const { data } = await supabase
         .from("products")
-        .select("*, product_images(*)")
+        .select("*, product_images(*), categories(*)")
         .eq("slug", slug)
         .single();
       return data as any;
@@ -58,10 +58,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         id: dbProduct.id,
         name: dbProduct.name,
         slug: dbProduct.slug,
-        category: dbProduct.category_id || "Ayurvedic Care",
+        category: dbProduct.categories?.name || localProduct?.category || "Hair Care",
         shortDescription: dbProduct.description,
-        price: Number(dbProduct.price),
-        offerPrice: dbProduct.offer_price ? Number(dbProduct.offer_price) : undefined,
+        price: localProduct?.price || Number(dbProduct.price),
         images:
           dbProduct.product_images && dbProduct.product_images.length > 0
             ? dbProduct.product_images
@@ -96,7 +95,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   });
 
   useEffect(() => {
-    if (!product) return;
+    if (!product?.id) return;
     const tl = gsap.timeline();
     tl.fromTo(
       imageRef.current,
@@ -108,7 +107,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power2.out" },
       "-=0.5"
     );
-  }, [product]);
+  }, [product?.id]);
 
   if (!product) {
     return (
@@ -187,7 +186,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       "@type": "Offer",
       "url": `https://www.shivamritayurveda.in/products/${product.slug}`,
       "priceCurrency": "INR",
-      "price": product.offerPrice || product.price,
+      "price": product.price,
       "itemCondition": "https://schema.org/NewCondition",
       "availability": "https://schema.org/InStock",
       "seller": {
