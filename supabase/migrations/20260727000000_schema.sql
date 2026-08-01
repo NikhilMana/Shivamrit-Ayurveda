@@ -1,14 +1,7 @@
 -- Enable pgcrypto for UUID generation if needed
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- Clean drop for clean migration alignment
-DROP TABLE IF EXISTS public.order_items CASCADE;
-DROP TABLE IF EXISTS public.payments CASCADE;
-DROP TABLE IF EXISTS public.orders CASCADE;
-DROP TABLE IF EXISTS public.cart_items CASCADE;
-DROP TABLE IF EXISTS public.reviews CASCADE;
-DROP TABLE IF EXISTS public.product_images CASCADE;
-DROP TABLE IF EXISTS public.products CASCADE;
+-- Table creations with IF NOT EXISTS
 
 -- ========================================================
 -- 1. PROFILES TABLE (linked to auth.users)
