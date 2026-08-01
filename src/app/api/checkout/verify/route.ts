@@ -37,6 +37,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Idempotency Check: Prevent duplicate order creation
+    const { data: existingOrders } = await (supabase
+      .from("orders") as any)
+      .select("*")
+      .or(`razorpay_payment_id.eq.${razorpay_payment_id},razorpay_order_id.eq.${razorpay_order_id}`);
+
+    if (existingOrders && existingOrders.length > 0) {
+      const existingOrder = existingOrders[0];
+      return NextResponse.json({ success: true, order: existingOrder, idempotent: true });
+    }
+
     // Insert Order
     const { data: order, error: orderError } = await (supabase
       .from("orders") as any)
@@ -58,14 +69,16 @@ export async function POST(request: Request) {
     if (orderError) throw orderError;
 
     // Insert Order Items
-    const orderItemsPayload = items.map((item: any) => ({
-      order_id: order.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      price: item.price,
-    }));
+    if (items && items.length > 0) {
+      const orderItemsPayload = items.map((item: any) => ({
+        order_id: order.id,
+        product_id: item.product_id || item.id,
+        quantity: item.quantity || 1,
+        price: item.price || 0,
+      }));
 
-    await (supabase.from("order_items") as any).insert(orderItemsPayload);
+      await (supabase.from("order_items") as any).insert(orderItemsPayload);
+    }
 
     // Insert Payment Record
     await (supabase.from("payments") as any).insert({
@@ -80,20 +93,24 @@ export async function POST(request: Request) {
     // Clear DB Cart
     await (supabase.from("cart_items") as any).delete().eq("user_id", user.id);
 
-    // Trigger Order Confirmation Email
+    // Trigger Order Confirmation Email with robust email resolution
     const { data: profile } = await (supabase
       .from("profiles") as any)
-      .select("full_name")
+      .select("full_name, email")
       .eq("id", user.id)
       .single();
 
-    await sendOrderConfirmationEmail(
-      user.email || "",
-      profile?.full_name || "Valued Customer",
-      order.id,
-      total_amount,
-      `${items.length} items purchased via Razorpay`
-    );
+    const customerEmail = user.email || profile?.email || "";
+
+    if (customerEmail) {
+      await sendOrderConfirmationEmail(
+        customerEmail,
+        profile?.full_name || "Valued Customer",
+        order.id,
+        total_amount,
+        `${items?.length || 1} items purchased via Razorpay`
+      );
+    }
 
     return NextResponse.json({ success: true, order });
   } catch (error: any) {
