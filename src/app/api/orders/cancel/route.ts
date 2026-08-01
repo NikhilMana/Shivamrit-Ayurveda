@@ -46,18 +46,36 @@ export async function POST(request: Request) {
       );
     }
 
-    // If order is COD or Unpaid: Cancel immediately
-    if (order.payment_method === "cod" || order.payment_status !== "paid") {
-      const { error: updateError } = await (supabase
+    // Helper to safely update order with fallback if cancel_reason column cache is reloading
+    const safeUpdate = async (newOrderStatus: string, defaultReason: string) => {
+      let { error: updateError } = await (supabase
         .from("orders") as any)
         .update({
-          order_status: "cancelled",
-          cancel_reason: reason || "Cancelled by customer",
+          order_status: newOrderStatus,
+          cancel_reason: reason || defaultReason,
           updated_at: new Date().toISOString(),
         })
         .eq("id", order.id);
 
+      // Fallback if cancel_reason column is transiently missing in PostgREST schema cache
+      if (updateError && updateError.message?.includes("cancel_reason")) {
+        console.warn("PostgREST schema cache fallback: updating order_status without cancel_reason");
+        const { error: fallbackError } = await (supabase
+          .from("orders") as any)
+          .update({
+            order_status: newOrderStatus,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", order.id);
+        updateError = fallbackError;
+      }
+
       if (updateError) throw updateError;
+    };
+
+    // If order is COD or Unpaid: Cancel immediately
+    if (order.payment_method === "cod" || order.payment_status !== "paid") {
+      await safeUpdate("cancelled", "Cancelled by customer");
 
       return NextResponse.json({
         success: true,
@@ -67,16 +85,7 @@ export async function POST(request: Request) {
     }
 
     // If order is Paid (e.g. via Razorpay): Request Cancellation for Admin Approval & Refund
-    const { error: updateError } = await (supabase
-      .from("orders") as any)
-      .update({
-        order_status: "cancellation_requested",
-        cancel_reason: reason || "Cancellation & refund requested by customer",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", order.id);
-
-    if (updateError) throw updateError;
+    await safeUpdate("cancellation_requested", "Cancellation & refund requested by customer");
 
     // Fetch customer profile for email
     const { data: profile } = await (supabase
