@@ -41,8 +41,10 @@ export default function ProductsPage() {
         return matchesCategory && matchesSearch;
       })
       .sort((a, b) => {
-        if (sortBy === "price-low") return a.price - b.price;
-        if (sortBy === "price-high") return b.price - a.price;
+        const priceA = a.distributorPrice || a.price;
+        const priceB = b.distributorPrice || b.price;
+        if (sortBy === "price-low") return priceA - priceB;
+        if (sortBy === "price-high") return priceB - priceA;
         if (sortBy === "name") return a.name.localeCompare(b.name);
         return 0;
       });
@@ -51,10 +53,11 @@ export default function ProductsPage() {
   const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const effectivePrice = product.distributorPrice || product.price;
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: effectivePrice,
       image: product.images[0],
     });
   };
@@ -186,8 +189,10 @@ export default function ProductsPage() {
           /* Amazon Modern Grid View */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {filteredProducts.map((product) => {
-              const estimatedMrp = Math.round(product.price * 1.3);
-              const discountPercent = Math.round(((estimatedMrp - product.price) / estimatedMrp) * 100);
+              const effectivePrice = product.distributorPrice || product.price;
+              const mrp = product.price;
+              const hasDiscount = product.distributorPrice && product.distributorPrice < product.price;
+              const discountPercent = hasDiscount ? Math.round(((mrp - effectivePrice) / mrp) * 100) : 0;
 
               return (
                 <div
@@ -266,14 +271,18 @@ export default function ProductsPage() {
                     <div className="pt-3 border-t border-gray-100">
                       <div className="flex items-baseline gap-2 mb-1">
                         <span className="font-serif text-2xl font-bold text-[#3A2B28]">
-                          ₹{product.price.toLocaleString("en-IN")}
+                          ₹{effectivePrice.toLocaleString("en-IN")}
                         </span>
-                        <span className="text-xs text-gray-400 line-through">
-                          ₹{estimatedMrp.toLocaleString("en-IN")}
-                        </span>
-                        <span className="text-[10px] text-emerald-700 font-bold">
-                          Save ₹{estimatedMrp - product.price}
-                        </span>
+                        {hasDiscount && (
+                          <>
+                            <span className="text-xs text-gray-400 line-through">
+                              ₹{mrp.toLocaleString("en-IN")}
+                            </span>
+                            <span className="text-[10px] text-emerald-700 font-bold">
+                              Save ₹{mrp - effectivePrice}
+                            </span>
+                          </>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium mb-4">
@@ -309,8 +318,10 @@ export default function ProductsPage() {
           /* Amazon Horizontal Row List View */
           <div className="flex flex-col gap-6">
             {filteredProducts.map((product) => {
-              const estimatedMrp = Math.round(product.price * 1.3);
-              const discountPercent = Math.round(((estimatedMrp - product.price) / estimatedMrp) * 100);
+              const effectivePrice = product.distributorPrice || product.price;
+              const mrp = product.price;
+              const hasDiscount = product.distributorPrice && product.distributorPrice < product.price;
+              const discountPercent = hasDiscount ? Math.round(((mrp - effectivePrice) / mrp) * 100) : 0;
 
               return (
                 <div
@@ -372,16 +383,20 @@ export default function ProductsPage() {
                   {/* Right Commercial Actions */}
                   <div className="w-full md:w-64 p-4 rounded-2xl bg-[#FFF8F4] border border-[#C89B3C]/20 shrink-0 flex flex-col justify-between space-y-4">
                     <div>
-                      <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
-                        Save {discountPercent}% Today
-                      </span>
+                      {discountPercent > 0 && (
+                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
+                          Save {discountPercent}% Today
+                        </span>
+                      )}
                       <div className="flex items-baseline gap-2 mt-1">
                         <span className="font-serif text-3xl font-bold text-[#3A2B28]">
-                          ₹{product.price.toLocaleString("en-IN")}
+                          ₹{effectivePrice.toLocaleString("en-IN")}
                         </span>
-                        <span className="text-xs text-gray-400 line-through">
-                          ₹{estimatedMrp.toLocaleString("en-IN")}
-                        </span>
+                        {hasDiscount && (
+                          <span className="text-xs text-gray-400 line-through">
+                            ₹{mrp.toLocaleString("en-IN")}
+                          </span>
+                        )}
                       </div>
                       <span className="text-[10px] text-gray-500 block mt-0.5">
                         MRP incl. of all taxes

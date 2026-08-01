@@ -158,7 +158,7 @@ export default function CheckoutPage() {
         if (!res.ok) throw new Error(razorpayData.error || "Razorpay initialization failed");
 
         const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TIRQvygPZydvEl",
+          key: razorpayData.key_id || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TIRna8aLkJDtL0",
           amount: razorpayData.order.amount,
           currency: "INR",
           name: "Shivamrit Ayurveda",

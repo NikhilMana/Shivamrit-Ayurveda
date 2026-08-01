@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const razorpay = getRazorpayClient();
+    const { razorpay, key_id } = getRazorpayClient();
 
     const options = {
       amount: amountInPaise,
@@ -41,6 +41,7 @@ export async function POST(request: Request) {
       id: order.id,
       amount: order.amount,
       currency: order.currency,
+      key_id,
       order,
     });
   } catch (error: any) {
