@@ -42,6 +42,12 @@ export default function AccountPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Cancel Order Modal State
+  const [cancellingOrder, setCancellingOrder] = useState<any | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
   // Fetch Current User
   const { data: user } = useQuery({
     queryKey: ["user"],
@@ -209,7 +215,41 @@ export default function AccountPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  // Handle Customer Order Cancellation Submission
+  const handleConfirmCancel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cancellingOrder) return;
+    setIsCancelling(true);
+    setCancelError(null);
+
+    try {
+      const res = await fetch("/api/orders/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order_id: cancellingOrder.id,
+          reason: cancelReason.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to cancel order");
+
+      queryClient.invalidateQueries({ queryKey: ["user-orders", user?.id] });
+      setCancellingOrder(null);
+      setCancelReason("");
+      alert(data.message || "Order cancellation processed.");
+    } catch (err: any) {
+      setCancelError(err.message || "An error occurred while submitting cancellation.");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  const getStatusBadge = (order: any) => {
+    const status = order.order_status;
+    const paymentStatus = order.payment_status;
+
     switch (status) {
       case "delivered":
         return (
@@ -223,16 +263,22 @@ export default function AccountPage() {
             <Truck className="w-3.5 h-3.5" /> Shipped
           </span>
         );
+      case "cancellation_requested":
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
+            <Clock className="w-3.5 h-3.5 text-amber-700" /> Cancellation Requested
+          </span>
+        );
       case "cancelled":
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">
-            <XCircle className="w-3.5 h-3.5" /> Cancelled
+            <XCircle className="w-3.5 h-3.5" /> Cancelled {paymentStatus === "refunded" ? "(Refunded)" : ""}
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
-            <Clock className="w-3.5 h-3.5" /> Pending
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Confirmed
           </span>
         );
     }
@@ -313,7 +359,7 @@ export default function AccountPage() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                      {getStatusBadge(order.order_status)}
+                      {getStatusBadge(order)}
                       <span className="font-bold text-[#1a392a]">₹{order.total_amount}</span>
                     </div>
                   </div>
@@ -327,6 +373,33 @@ export default function AccountPage() {
                         <span className="font-medium">₹{item.price * item.quantity}</span>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Order Actions / Cancel Section */}
+                  <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="text-xs text-gray-500">
+                      <span>Payment: <strong className="uppercase font-semibold">{order.payment_method}</strong> ({order.payment_status})</span>
+                    </div>
+
+                    {["pending", "confirmed"].includes(order.order_status) && (
+                      <button
+                        onClick={() => {
+                          setCancellingOrder(order);
+                          setCancelReason("");
+                          setCancelError(null);
+                        }}
+                        className="px-4 py-1.5 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold transition-colors flex items-center gap-1.5"
+                      >
+                        <XCircle className="w-3.5 h-3.5" /> Cancel Order
+                      </button>
+                    )}
+
+                    {order.order_status === "cancellation_requested" && (
+                      <div className="w-full sm:w-auto px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0 text-amber-600" />
+                        <span>Cancellation requested. Pending admin review & refund approval.</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))
@@ -550,6 +623,72 @@ export default function AccountPage() {
                   className="px-6 py-2.5 rounded-xl bg-[#1a392a] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#234b37] disabled:opacity-50"
                 >
                   {isSubmitting ? "Saving..." : "Save Address"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Order Confirmation Modal */}
+      {cancellingOrder && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white w-full max-w-md rounded-3xl border border-red-200 p-6 sm:p-8 text-[#3A2B28] shadow-2xl relative my-auto">
+            <button
+              onClick={() => setCancellingOrder(null)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-4">
+              <XCircle className="w-6 h-6" />
+            </div>
+
+            <h3 className="font-serif text-xl font-bold text-slate-900 mb-1">
+              Cancel Order #{cancellingOrder.id.slice(0, 8).toUpperCase()}?
+            </h3>
+            <p className="text-xs text-gray-500 mb-4">
+              {cancellingOrder.payment_method === "razorpay" && cancellingOrder.payment_status === "paid"
+                ? "Since payment was completed via Razorpay, submitting this will request cancellation. Our team will approve and initiate your refund."
+                : "Are you sure you want to cancel this order?"}
+            </p>
+
+            {cancelError && (
+              <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 flex items-center gap-2 text-red-700 text-xs">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{cancelError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleConfirmCancel} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  Reason for Cancellation (Optional)
+                </label>
+                <textarea
+                  rows={3}
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="e.g. Ordered by mistake, want to change items or delivery address..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#1a392a]"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCancellingOrder(null)}
+                  className="px-5 py-2.5 rounded-xl border border-gray-300 text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-50"
+                >
+                  Keep Order
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCancelling}
+                  className="px-6 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold uppercase tracking-wider hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  {isCancelling ? "Processing..." : "Confirm Cancellation"}
                 </button>
               </div>
             </form>

@@ -15,7 +15,9 @@ import {
   ChevronDown, 
   ChevronUp, 
   Search,
-  ExternalLink
+  ExternalLink,
+  AlertCircle,
+  XCircle
 } from "lucide-react";
 
 export default function AdminOrdersPage() {
@@ -51,6 +53,27 @@ export default function AdminOrdersPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+    },
+  });
+
+  // Mutation to Approve / Reject Cancellation & Process Razorpay Refund
+  const approveCancellationMutation = useMutation({
+    mutationFn: async ({ id, action = "approve" }: { id: string; action?: "approve" | "reject" }) => {
+      const res = await fetch("/api/admin/orders/cancel-approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: id, action }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to process cancellation request");
+      return data;
+    },
+    onSuccess: (data) => {
+      alert(data.message || "Cancellation approval processed successfully.");
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+    },
+    onError: (err: any) => {
+      alert(`Error processing request: ${err.message}`);
     },
   });
 
@@ -150,11 +173,63 @@ export default function AdminOrdersPage() {
             const custPhone = addr.phone || o.profiles?.phone || "N/A";
             const isExpanded = expandedOrderId === o.id;
 
+            const isCancellationRequested = o.order_status === "cancellation_requested";
+
             return (
               <div
                 key={o.id}
-                className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all hover:border-slate-300"
+                className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-all hover:border-slate-300 ${
+                  isCancellationRequested ? "border-amber-400 ring-2 ring-amber-400/20" : "border-slate-200"
+                }`}
               >
+                {/* Cancellation Request Action Banner */}
+                {isCancellationRequested && (
+                  <div className="bg-amber-50 border-b border-amber-200 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-amber-900">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-amber-100 text-amber-700 shrink-0">
+                        <AlertCircle className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-amber-900">
+                          Cancellation & Refund Requested
+                        </p>
+                        <p className="text-xs text-amber-800">
+                          {o.cancel_reason
+                            ? `Reason: "${o.cancel_reason}"`
+                            : "Customer requested cancellation for this order."}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
+                      <button
+                        onClick={() => {
+                          if (confirm(`Approve cancellation for order #${o.id.slice(0, 8).toUpperCase()}? If paid via Razorpay, refund of ₹${o.total_amount} will be automatically initiated.`)) {
+                            approveCancellationMutation.mutate({ id: o.id, action: "approve" });
+                          }
+                        }}
+                        disabled={approveCancellationMutation.isPending}
+                        className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs disabled:opacity-50 flex items-center gap-1.5"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>{approveCancellationMutation.isPending ? "Processing..." : "Approve & Refund"}</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          if (confirm(`Reject cancellation request and restore order #${o.id.slice(0, 8).toUpperCase()} to Confirmed?`)) {
+                            approveCancellationMutation.mutate({ id: o.id, action: "reject" });
+                          }
+                        }}
+                        disabled={approveCancellationMutation.isPending}
+                        className="px-3.5 py-2 rounded-xl bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 text-xs font-bold uppercase tracking-wider transition-colors"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Order Header Summary */}
                 <div className="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
                   <div className="flex items-center gap-4">
@@ -193,6 +268,8 @@ export default function AdminOrdersPage() {
                         className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold capitalize ${
                           o.payment_status === "paid"
                             ? "bg-emerald-100 text-emerald-800"
+                            : o.payment_status === "refunded"
+                            ? "bg-purple-100 text-purple-800"
                             : "bg-amber-100 text-amber-800"
                         }`}
                       >
@@ -213,6 +290,7 @@ export default function AdminOrdersPage() {
                     >
                       <option value="pending">Pending</option>
                       <option value="confirmed">Confirmed</option>
+                      <option value="cancellation_requested">Cancellation Requested</option>
                       <option value="shipped">Shipped</option>
                       <option value="delivered">Delivered</option>
                       <option value="cancelled">Cancelled</option>

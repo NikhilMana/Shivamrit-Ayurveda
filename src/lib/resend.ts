@@ -113,3 +113,108 @@ export async function sendOrderConfirmationEmail(
     return { success: false, error };
   }
 }
+
+export async function sendCancellationRequestedEmail(
+  toEmail: string,
+  fullName: string,
+  orderId: string,
+  totalAmount: number
+) {
+  if (!resend) {
+    console.log(
+      `[Resend Mock] Cancellation request email queued for ${toEmail} (Order #${orderId})`
+    );
+    return { success: true, mock: true };
+  }
+
+  try {
+    const data = await resend.emails.send({
+      from: fromEmail,
+      to: [toEmail],
+      subject: `Order Cancellation Requested #${orderId.slice(0, 8).toUpperCase()} - Shivamrit Ayurveda`,
+      html: `
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #FFF8F4; color: #3A2B28; border: 1px solid #EADBCE; border-radius: 16px;">
+          <div style="text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #C89B3C;">
+            <h1 style="font-family: Georgia, serif; font-size: 26px; color: #C89B3C; margin: 0; letter-spacing: 2px;">SHIVAMRIT AYURVEDA</h1>
+            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 3px; color: #6D5A56; margin-top: 4px;">Cancellation Request Received</p>
+          </div>
+          
+          <h2 style="font-family: Georgia, serif; color: #3A2B28; font-size: 20px;">Dear ${fullName},</h2>
+          <p style="line-height: 1.6; color: #6D5A56; font-size: 14px;">
+            We have received your cancellation request for order <strong>#${orderId.slice(0, 8).toUpperCase()}</strong> (Total: ₹${totalAmount.toLocaleString("en-IN")}).
+          </p>
+
+          <div style="background-color: #FFF3CD; padding: 18px; border-radius: 12px; margin: 20px 0; border: 1px solid #FFEBAA;">
+            <p style="font-size: 13px; color: #856404; margin: 0; line-height: 1.5;">
+              ⏳ <strong>Pending Admin Review & Refund:</strong> Since payment was completed, our administration team will review your cancellation request, approve it, and initiate the Razorpay refund directly to your source payment method within 24-48 business hours.
+            </p>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #EADBCE; margin: 25px 0 15px 0;" />
+          <p style="font-size: 11px; color: #6D5A56; text-align: center; margin: 0;">
+            Support Helpline: Dr. Shashank Mana (+91 8123403829) | Dr. Prashant Mali (+91 9353912943)
+          </p>
+        </div>
+      `,
+    });
+    return { success: true, data };
+  } catch (error) {
+    console.error("Resend Cancellation Request Email error:", error);
+    return { success: false, error };
+  }
+}
+
+export async function sendRefundConfirmationEmail(
+  toEmail: string,
+  fullName: string,
+  orderId: string,
+  totalAmount: number,
+  refundId?: string
+) {
+  if (!resend) {
+    console.log(
+      `[Resend Mock] Refund confirmation email queued for ${toEmail} (Order #${orderId}, Refund ID ${refundId || "N/A"})`
+    );
+    return { success: true, mock: true };
+  }
+
+  try {
+    const data = await resend.emails.send({
+      from: fromEmail,
+      to: [toEmail],
+      subject: `Order Cancelled & Refund Initiated #${orderId.slice(0, 8).toUpperCase()} - Shivamrit Ayurveda`,
+      html: `
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #FFF8F4; color: #3A2B28; border: 1px solid #EADBCE; border-radius: 16px;">
+          <div style="text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #C89B3C;">
+            <h1 style="font-family: Georgia, serif; font-size: 26px; color: #C89B3C; margin: 0; letter-spacing: 2px;">SHIVAMRIT AYURVEDA</h1>
+            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 3px; color: #28A745; margin-top: 4px;">Refund Processed</p>
+          </div>
+          
+          <h2 style="font-family: Georgia, serif; color: #3A2B28; font-size: 20px;">Dear ${fullName},</h2>
+          <p style="line-height: 1.6; color: #6D5A56; font-size: 14px;">
+            Your cancellation for order <strong>#${orderId.slice(0, 8).toUpperCase()}</strong> has been approved. A full refund of <strong>₹${totalAmount.toLocaleString("en-IN")}</strong> has been initiated via Razorpay.
+          </p>
+
+          <div style="background-color: #D4EDDA; padding: 18px; border-radius: 12px; margin: 20px 0; border: 1px solid #C3E6CB;">
+            <h3 style="font-family: Georgia, serif; margin-top: 0; color: #155724; font-size: 15px;">Refund Details:</h3>
+            <p style="font-size: 13px; color: #155724; margin: 4px 0;"><strong>Refund Amount:</strong> ₹${totalAmount.toLocaleString("en-IN")}</p>
+            ${refundId ? `<p style="font-size: 13px; color: #155724; margin: 4px 0;"><strong>Razorpay Refund Ref ID:</strong> ${refundId}</p>` : ""}
+            <p style="font-size: 12px; color: #155724; margin-top: 8px;">
+              The refund will reflect in your bank account / UPI / payment card within 5-7 working days as per Razorpay & banking timelines.
+            </p>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #EADBCE; margin: 25px 0 15px 0;" />
+          <p style="font-size: 11px; color: #6D5A56; text-align: center; margin: 0;">
+            Support Helpline: Dr. Shashank Mana (+91 8123403829) | Dr. Prashant Mali (+91 9353912943)
+          </p>
+        </div>
+      `,
+    });
+    return { success: true, data };
+  } catch (error) {
+    console.error("Resend Refund Confirmation Email error:", error);
+    return { success: false, error };
+  }
+}
+

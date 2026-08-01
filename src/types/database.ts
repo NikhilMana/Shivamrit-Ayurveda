@@ -211,8 +211,8 @@ export interface Database {
           discount: number;
           total_amount: number;
           payment_method: "razorpay" | "cod";
-          payment_status: "pending" | "paid" | "failed";
-          order_status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+          payment_status: "pending" | "paid" | "failed" | "refunded";
+          order_status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled" | "cancellation_requested";
           razorpay_order_id: string | null;
           razorpay_payment_id: string | null;
           created_at: string;
@@ -227,8 +227,8 @@ export interface Database {
           discount?: number;
           total_amount: number;
           payment_method: "razorpay" | "cod";
-          payment_status?: "pending" | "paid" | "failed";
-          order_status?: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+          payment_status?: "pending" | "paid" | "failed" | "refunded";
+          order_status?: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled" | "cancellation_requested";
           razorpay_order_id?: string | null;
           razorpay_payment_id?: string | null;
           created_at?: string;
@@ -243,8 +243,8 @@ export interface Database {
           discount?: number;
           total_amount?: number;
           payment_method?: "razorpay" | "cod";
-          payment_status?: "pending" | "paid" | "failed";
-          order_status?: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+          payment_status?: "pending" | "paid" | "failed" | "refunded";
+          order_status?: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled" | "cancellation_requested";
           razorpay_order_id?: string | null;
           razorpay_payment_id?: string | null;
           created_at?: string;
