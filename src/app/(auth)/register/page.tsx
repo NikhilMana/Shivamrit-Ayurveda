@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { User, Mail, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { User, Mail, Lock, Phone, AlertCircle, CheckCircle2 } from "lucide-react";
 
 function RegisterForm() {
   const router = useRouter();
@@ -12,6 +12,7 @@ function RegisterForm() {
   const redirect = searchParams.get("redirect") || "/";
 
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +35,7 @@ function RegisterForm() {
       options: {
         data: {
           full_name: fullName,
+          phone: phone.trim(),
         },
         emailRedirectTo: `${callbackOrigin}/api/auth/callback?next=${encodeURIComponent(redirect)}`,
       },
@@ -42,11 +44,25 @@ function RegisterForm() {
     if (error) {
       setError(error.message);
       setLoading(false);
-    } else if (data.session) {
-      window.location.href = redirect;
     } else {
-      setSuccess(true);
-      setLoading(false);
+      if (data.user) {
+        // Upsert profile record with email and phone credentials
+        await (supabase.from("profiles") as any).upsert({
+          id: data.user.id,
+          full_name: fullName.trim(),
+          phone: phone.trim(),
+          email: email.trim(),
+          role: "customer",
+          updated_at: new Date().toISOString(),
+        });
+      }
+
+      if (data.session) {
+        window.location.href = redirect;
+      } else {
+        setSuccess(true);
+        setLoading(false);
+      }
     }
   };
 
@@ -111,6 +127,25 @@ function RegisterForm() {
                   onChange={(e) => setFullName(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1a392a] focus:border-[#1a392a] sm:text-sm"
                   placeholder="Your Full Name"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Mobile Phone Number
+              </label>
+              <div className="mt-1 relative rounded-xl shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Phone className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1a392a] focus:border-[#1a392a] sm:text-sm"
+                  placeholder="+91 9876543210"
                 />
               </div>
             </div>
