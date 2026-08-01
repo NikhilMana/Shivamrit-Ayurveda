@@ -26,17 +26,13 @@ function StickyProductCard({ product, index, total, progress, onOpenDetails }: C
 
   const scale = useTransform(progress, [cardStart, cardEnd], [1, targetScale]);
 
-  const effectivePrice = product.distributorPrice || product.price;
-  const mrp = product.price;
-  const hasDiscount = product.distributorPrice && product.distributorPrice < product.price;
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     addItem({
       id: product.id,
       name: product.name,
-      price: effectivePrice,
+      price: product.price,
       image: product.images[0],
     });
   };
@@ -113,13 +109,8 @@ function StickyProductCard({ product, index, total, progress, onOpenDetails }: C
             </h3>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="font-serif text-base sm:text-xl font-bold text-[#C89B3C]">
-                ₹{effectivePrice.toLocaleString("en-IN")}
+                ₹{product.price.toLocaleString("en-IN")}
               </span>
-              {hasDiscount && (
-                <span className="text-xs text-gray-400 line-through">
-                  ₹{mrp.toLocaleString("en-IN")}
-                </span>
-              )}
               <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-[#6D5A56] border border-[#6D5A56]/20 px-1.5 py-0.5 rounded-md bg-[#FFF8F4]">
                 MRP (Incl. taxes)
               </span>
@@ -165,15 +156,11 @@ function ProductDetailsModal({ product, onClose }: ModalProps) {
 
   if (!product) return null;
 
-  const effectivePrice = product.distributorPrice || product.price;
-  const mrp = product.price;
-  const hasDiscount = product.distributorPrice && product.distributorPrice < product.price;
-
   const handleAddToCart = () => {
     addItem({
       id: product.id,
       name: product.name,
-      price: effectivePrice,
+      price: product.price,
       image: product.images[0],
     });
     onClose();
@@ -219,16 +206,9 @@ function ProductDetailsModal({ product, onClose }: ModalProps) {
           <h2 className="font-serif text-2xl sm:text-3xl text-[#3A2B28] font-medium leading-snug">
             {product.name}
           </h2>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="font-serif text-xl sm:text-2xl font-bold text-[#C89B3C]">
-              ₹{effectivePrice.toLocaleString("en-IN")}
-            </span>
-            {hasDiscount && (
-              <span className="text-sm text-gray-400 line-through">
-                ₹{mrp.toLocaleString("en-IN")}
-              </span>
-            )}
-          </div>
+          <span className="font-serif text-xl sm:text-2xl font-bold text-[#C89B3C] mt-1 block">
+            ₹{product.price.toLocaleString("en-IN")}
+          </span>
         </div>
 
         {/* Product Image Preview */}
@@ -280,7 +260,7 @@ function ProductDetailsModal({ product, onClose }: ModalProps) {
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#C89B3C] text-white hover:bg-[#3A2B28] text-xs font-bold uppercase tracking-widest transition-all shadow-lg interactive hover:scale-105"
           >
             <ShoppingBag className="w-4 h-4 text-white" />
-            <span>Add to Cart — ₹{effectivePrice.toLocaleString("en-IN")}</span>
+            <span>Add to Cart — ₹{product.price.toLocaleString("en-IN")}</span>
           </button>
         </div>
       </motion.div>

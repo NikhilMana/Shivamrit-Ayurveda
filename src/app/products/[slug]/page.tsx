@@ -75,7 +75,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     : localProduct
     ? {
         ...localProduct,
-        offerPrice: localProduct.distributorPrice,
         ingredients: "Active Herbal Formulations",
         usage: "Gentle daily application.",
       }
@@ -123,7 +122,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     addItem({
       id: product.id,
       name: product.name,
-      price: product.offerPrice || product.price,
+      price: product.price,
       image: product.images[0],
     });
   };
@@ -283,13 +282,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
             <div className="flex items-baseline gap-3 mb-6">
               <p className="font-serif text-3xl font-bold text-[#C89B3C]">
-                ₹{(product.offerPrice || product.price).toLocaleString("en-IN")}
+                ₹{product.price.toLocaleString("en-IN")}
               </p>
-              {product.offerPrice && product.offerPrice < product.price && (
-                <p className="text-gray-400 line-through text-lg">
-                  ₹{product.price.toLocaleString("en-IN")}
-                </p>
-              )}
             </div>
 
             <p className="text-[#6D5A56] font-light leading-relaxed mb-8 text-base md:text-lg">
