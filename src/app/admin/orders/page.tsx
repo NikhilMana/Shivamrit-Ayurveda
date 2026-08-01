@@ -17,7 +17,9 @@ import {
   Search,
   ExternalLink,
   AlertCircle,
-  XCircle
+  XCircle,
+  RotateCcw,
+  X
 } from "lucide-react";
 
 export default function AdminOrdersPage() {
@@ -29,6 +31,45 @@ export default function AdminOrdersPage() {
   const [copiedAddressId, setCopiedAddressId] = useState<string | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
   const [trackingInputs, setTrackingInputs] = useState<{ [orderId: string]: { tracking: string; courier: string } }>({});
+
+  // Payment Recovery Modal State
+  const [showRecoverModal, setShowRecoverModal] = useState(false);
+  const [recoverPaymentId, setRecoverPaymentId] = useState("");
+  const [recoverTargetEmail, setRecoverTargetEmail] = useState("");
+  const [isRecovering, setIsRecovering] = useState(false);
+  const [recoverError, setRecoverError] = useState<string | null>(null);
+
+  // Handle Admin Payment Recovery
+  const handleRecoverPayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!recoverPaymentId.trim()) return;
+    setIsRecovering(true);
+    setRecoverError(null);
+
+    try {
+      const res = await fetch("/api/admin/orders/recover-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          payment_id: recoverPaymentId.trim(),
+          target_email: recoverTargetEmail.trim() || undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to recover payment");
+
+      alert(data.message || "Payment recovered successfully!");
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      setShowRecoverModal(false);
+      setRecoverPaymentId("");
+      setRecoverTargetEmail("");
+    } catch (err: any) {
+      setRecoverError(err.message || "An error occurred during payment recovery.");
+    } finally {
+      setIsRecovering(false);
+    }
+  };
 
   // Fetch orders with profiles, addresses, and order items
   const { data: orders = [], isLoading } = useQuery({
@@ -144,16 +185,26 @@ export default function AdminOrdersPage() {
           </p>
         </div>
 
-        {/* Search Input */}
-        <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search name, phone, city..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#C89B3C] bg-white shadow-xs"
-          />
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <button
+            onClick={() => setShowRecoverModal(true)}
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#C89B3C] text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-[#1a392a] transition-all shadow-xs"
+          >
+            <RotateCcw className="w-4 h-4" /> Recover Missing Payment
+          </button>
+
+          {/* Search Input */}
+          <div className="relative w-full sm:w-64">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search name, phone, city..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#C89B3C] bg-white shadow-xs"
+            />
+          </div>
         </div>
       </div>
 
@@ -466,6 +517,84 @@ export default function AdminOrdersPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Admin Recover Missing Payment Modal */}
+      {showRecoverModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white w-full max-w-md rounded-3xl border border-slate-200 p-6 sm:p-8 text-slate-800 shadow-2xl relative my-auto">
+            <button
+              onClick={() => setShowRecoverModal(false)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-[#FFF8F4] border border-[#C89B3C]/20 text-[#C89B3C] flex items-center justify-center mb-4">
+              <RotateCcw className="w-6 h-6" />
+            </div>
+
+            <h3 className="font-serif text-xl font-bold text-slate-900 mb-1">
+              Recover Missing Payment
+            </h3>
+            <p className="text-xs text-slate-500 mb-6">
+              Enter any captured Razorpay Payment ID (e.g. <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">pay_TKazDbLVjC3Aj8</code>). The system will fetch payment & item credentials directly from Razorpay and create the order under the customer's profile.
+            </p>
+
+            {recoverError && (
+              <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 flex items-center gap-2 text-red-700 text-xs">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{recoverError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleRecoverPayment} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Razorpay Payment ID *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={recoverPaymentId}
+                  onChange={(e) => setRecoverPaymentId(e.target.value)}
+                  placeholder="e.g. pay_TKazDbLVjC3Aj8"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#C89B3C]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Customer Email (Optional Override)
+                </label>
+                <input
+                  type="email"
+                  value={recoverTargetEmail}
+                  onChange={(e) => setRecoverTargetEmail(e.target.value)}
+                  placeholder="e.g. shashankmana@gmail.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#C89B3C]"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowRecoverModal(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isRecovering}
+                  className="px-5 py-2.5 rounded-xl bg-[#C89B3C] hover:bg-slate-900 text-white text-xs font-bold uppercase tracking-wider disabled:opacity-50 transition-colors shadow-xs"
+                >
+                  {isRecovering ? "Recovering..." : "Recover & Create Order"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

@@ -151,6 +151,17 @@ export default function CheckoutPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             amount: finalTotal,
+            notes: {
+              user_id: user.id,
+              user_email: user.email || "",
+              user_phone: phone.trim(),
+              address_id: addressId,
+              items: items.map((i) => ({
+                product_id: i.id,
+                quantity: i.quantity,
+                price: i.price,
+              })),
+            },
           }),
         });
 
