@@ -146,13 +146,22 @@ export default function AdminOrdersPage() {
     const addr = o.addresses || {};
     const name = addr.full_name || o.profiles?.full_name || "Customer";
     const phone = addr.phone || o.profiles?.phone || "N/A";
-    const line1 = addr.address_line1 || "";
-    const line2 = addr.address_line2 ? `, ${addr.address_line2}` : "";
+    const line1 = addr.address_line_1 || addr.address_line1 || "";
+    const line2 = addr.address_line_2 || addr.address_line2 || "";
     const city = addr.city || "";
     const state = addr.state || "";
     const pincode = addr.postal_code || "";
 
-    const textToCopy = `Name: ${name}\nPhone: ${phone}\nAddress: ${line1}${line2}, ${city}, ${state} - ${pincode}`;
+    const parts = [
+      line1,
+      line2,
+      city,
+      state ? (pincode ? `${state} - ${pincode}` : state) : pincode,
+    ].filter(Boolean);
+
+    const fullAddressStr = parts.length > 0 ? parts.join(", ") : "No address provided";
+
+    const textToCopy = `Name: ${name}\nPhone: ${phone}\nAddress: ${fullAddressStr}`;
 
     navigator.clipboard.writeText(textToCopy);
     setCopiedAddressId(o.id);
@@ -402,9 +411,11 @@ export default function AdminOrdersPage() {
                       </div>
 
                       <p className="text-slate-600 font-medium">
-                        {addr.address_line1 || "No address line 1 provided"}
+                        {addr.address_line_1 || addr.address_line1 || "No address line 1 provided"}
                       </p>
-                      {addr.address_line2 && <p className="text-slate-600 font-medium">{addr.address_line2}</p>}
+                      {(addr.address_line_2 || addr.address_line2) && (
+                        <p className="text-slate-600 font-medium">{addr.address_line_2 || addr.address_line2}</p>
+                      )}
                       <p className="font-bold text-slate-800 pt-1">
                         {addr.city ? `${addr.city}, ` : ""}{addr.state ? `${addr.state} ` : ""}{addr.postal_code ? `- ${addr.postal_code}` : ""}
                       </p>
