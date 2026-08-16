@@ -4,8 +4,11 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useTransform, MotionValue } from "framer-motion";
 import { ShoppingBag, ChevronDown, X, Sparkles, Check, ShieldCheck } from "lucide-react";
-import { products, Product } from "@/data/products";
+import { products as staticProducts, Product } from "@/data/products";
 import { useCartStore } from "@/store/cartStore";
+import { createClient } from "@/lib/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { mapDbProductToProduct } from "@/lib/products";
 
 interface CardProps {
   product: Product;
@@ -271,6 +274,25 @@ function ProductDetailsModal({ product, onClose }: ModalProps) {
 export default function ProductsSection() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const targetRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
+
+  const { data: dbProducts } = useQuery({
+    queryKey: ["public-products"],
+    queryFn: async () => {
+      const { data, error } = await (supabase
+        .from("products") as any)
+        .select("*, product_images(*), categories(*)")
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+
+      if (error || !data) return null;
+      return data as any[];
+    },
+  });
+
+  const productsList = dbProducts && dbProducts.length > 0
+    ? dbProducts.map((dbP: any) => mapDbProductToProduct(dbP))
+    : staticProducts;
 
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -296,12 +318,12 @@ export default function ProductsSection() {
 
       {/* Fluid 3D Sticky Card Stack */}
       <div className="relative max-w-4xl mx-auto flex flex-col space-y-4">
-        {products.map((product, i) => (
+        {productsList.map((product, i) => (
           <StickyProductCard
             key={product.id}
             product={product}
             index={i}
-            total={products.length}
+            total={productsList.length}
             progress={scrollYProgress}
             onOpenDetails={setSelectedProduct}
           />

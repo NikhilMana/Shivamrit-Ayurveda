@@ -119,6 +119,8 @@ export default function AdminProductsPage() {
         }
       }
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["public-products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     } catch (err: any) {
       console.error("Seeding failed:", err);
       alert("Failed to seed catalog: " + err.message);
@@ -150,6 +152,8 @@ export default function AdminProductsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["public-products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
       setEditingProduct(null);
     },
   });
@@ -162,6 +166,8 @@ export default function AdminProductsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["public-products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     },
   });
 

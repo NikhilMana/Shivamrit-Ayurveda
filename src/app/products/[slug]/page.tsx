@@ -56,18 +56,20 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const product = dbProduct
     ? {
         id: dbProduct.id,
-        name: dbProduct.name,
-        slug: dbProduct.slug,
+        name: dbProduct.name || localProduct?.name || "Product",
+        slug: dbProduct.slug || localProduct?.slug || slug,
         category: dbProduct.categories?.name || localProduct?.category || "Hair Care",
-        shortDescription: dbProduct.description,
-        price: localProduct?.price || Number(dbProduct.price),
+        shortDescription: dbProduct.description || localProduct?.shortDescription || "",
+        price: dbProduct.price !== undefined && dbProduct.price !== null ? Number(dbProduct.price) : (localProduct?.price || 0),
+        distributorPrice: dbProduct.offer_price !== undefined && dbProduct.offer_price !== null ? Number(dbProduct.offer_price) : (localProduct?.distributorPrice || 0),
+        size: dbProduct.size || localProduct?.size,
         images:
           dbProduct.product_images && dbProduct.product_images.length > 0
             ? dbProduct.product_images
                 .sort((a: any, b: any) => a.display_order - b.display_order)
                 .map((img: any) => img.image_url)
             : localProduct?.images || ["/assets/combo pack.png"],
-        benefits: dbProduct.benefits || localProduct?.benefits || [],
+        benefits: dbProduct.benefits && dbProduct.benefits.length > 0 ? dbProduct.benefits : (localProduct?.benefits || []),
         ingredients: dbProduct.ingredients || "100% Active Botanical Herbs",
         usage: dbProduct.usage_instructions || "Use as directed on package.",
       }

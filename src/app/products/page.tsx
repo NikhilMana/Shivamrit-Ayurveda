@@ -16,8 +16,11 @@ import {
   Sparkles,
   ArrowRight
 } from "lucide-react";
-import { products, Product } from "@/data/products";
+import { products as staticProducts, Product } from "@/data/products";
 import { useCartStore } from "@/store/cartStore";
+import { createClient } from "@/lib/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { mapDbProductToProduct } from "@/lib/products";
 
 const CATEGORIES = ["All", "Hair Care", "Skin Care", "Accessories", "Sanctuary Kit"];
 
@@ -28,10 +31,32 @@ export default function ProductsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const { addItem } = useCartStore();
+  const supabase = createClient();
+
+  const { data: dbProducts } = useQuery({
+    queryKey: ["public-products"],
+    queryFn: async () => {
+      const { data, error } = await (supabase
+        .from("products") as any)
+        .select("*, product_images(*), categories(*)")
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+
+      if (error || !data) return null;
+      return data as any[];
+    },
+  });
+
+  const productsList = useMemo(() => {
+    if (dbProducts && dbProducts.length > 0) {
+      return dbProducts.map((dbP: any) => mapDbProductToProduct(dbP));
+    }
+    return staticProducts;
+  }, [dbProducts]);
 
   // Filter & Sort Products
   const filteredProducts = useMemo(() => {
-    return products
+    return productsList
       .filter((p) => {
         const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
         const matchesSearch =
@@ -46,7 +71,7 @@ export default function ProductsPage() {
         if (sortBy === "name") return a.name.localeCompare(b.name);
         return 0;
       });
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [productsList, searchQuery, selectedCategory, sortBy]);
 
   const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
